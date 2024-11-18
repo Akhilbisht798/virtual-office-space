@@ -26,6 +26,10 @@ func WebSocketHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	go handleConnection(conn)
+}
+
+func handleConnection(conn *websocket.Conn) {
 	defer conn.Close()
 
 	for {
@@ -48,7 +52,6 @@ func eventHandler(conn *websocket.Conn, message []byte) {
 		log.Println("Failed to unmarshal message:", err)
 		return
 	}
-	log.Println("Message: ", msg.Payload)
 
 	switch msg.Type {
 	case "join":

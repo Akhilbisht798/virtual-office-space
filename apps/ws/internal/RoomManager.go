@@ -26,7 +26,7 @@ func (rm *RoomManager) AddUserToRoom(roomID string, user *User) {
 		rm.rooms[roomID] = make(map[string]*User)
 	}
 	rm.rooms[roomID][user.Id] = user
-	log.Printf("Added User %s to Room %s: %v", user.Id, roomID, rm.rooms[roomID])
+	log.Printf("Added User %s to Room %s", user.Id, roomID)
 }
 
 type UserPosition struct {

@@ -3,7 +3,6 @@ package internal
 import (
 	"encoding/json"
 	"log"
-	"math"
 
 	"github.com/gorilla/websocket"
 )
@@ -11,7 +10,6 @@ import (
 var Rooms *RoomManager
 
 func join(conn *websocket.Conn, payload map[string]interface{}) {
-	log.Println("Payload From Join: ", payload)
 	user := &User{
 		conn: conn,
 		Id:   payload["userId"].(string),
@@ -19,7 +17,6 @@ func join(conn *websocket.Conn, payload map[string]interface{}) {
 		Y:    payload["y"].(float64),
 	}
 	room := payload["roomId"].(string)
-	log.Println("Room: ", room)
 
 	if Rooms == nil {
 		Rooms = NewRoomManager()
@@ -75,13 +72,17 @@ func move(conn *websocket.Conn, payload map[string]interface{}) {
 		}
 	}
 
-	var xDisplacement = math.Abs(float64(user.X) - float64(x))
-	var yDisplacement = math.Abs(float64(user.Y) - float64(y))
+	// var xDisplacement = math.Abs(float64(user.X) - float64(x))
+	// var yDisplacement = math.Abs(float64(user.Y) - float64(y))
+	// log.Println("Working till here.")
+	// log.Printf("%v - %v", float64(user.X), float64(x))
+	// log.Printf("%v - %v", float64(user.Y), float64(y))
 
 	// Movement Rejected
-	if xDisplacement > 2 || yDisplacement > 2 {
-		return
-	}
+	// if xDisplacement > 2 || yDisplacement > 2 {
+	// 	return
+	// }
+	// log.Println("Working till here 2.")
 
 	user.X = float64(x)
 	user.Y = float64(y)

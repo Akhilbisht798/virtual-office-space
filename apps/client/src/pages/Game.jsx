@@ -1,6 +1,7 @@
 import Phaser from "phaser";
 import GameScene from "../components/Game/GameClass";
 import { useEffect } from "react";
+import useSocket from "../hooks/useSocket";
 
 const sizes = {
     width: 400,
@@ -8,6 +9,7 @@ const sizes = {
 }
 
 const Game = () => {
+    // const ws = useSocket();
     useEffect(() => {
         const config = {
             type: Phaser.CANVAS,
@@ -32,8 +34,8 @@ const Game = () => {
 
         return () => {
             console.log("destroying game");
-            game.destroy(true, true);
             game.input.keyboard.destroy();
+            game.destroy(true, true);
         };
     }, []);
     return <canvas id="GameCanvas" />;

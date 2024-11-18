@@ -5,26 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="77972c57-7e6c-455e-9ff8-4ece7ae184e3" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/docs/.eslintrc.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/docs/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/docs/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/docs/app/favicon.ico" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/docs/app/fonts/GeistMonoVF.woff" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/docs/app/fonts/GeistVF.woff" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/docs/app/globals.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/docs/app/layout.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/docs/app/page.module.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/docs/app/page.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/docs/next.config.mjs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/docs/package.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/docs/public/file-text.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/docs/public/globe.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/docs/public/next.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/docs/public/vercel.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/docs/public/window.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/docs/tsconfig.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/client/src/components/Game/GameClass.js" beforeDir="false" afterPath="$PROJECT_DIR$/apps/client/src/components/Game/GameClass.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/client/src/components/Game/Player.js" beforeDir="false" afterPath="$PROJECT_DIR$/apps/client/src/components/Game/Player.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/client/src/pages/Game.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/client/src/pages/Game.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -33,6 +17,9 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/apps/ws/internal/handlers.go" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;customColor&quot;: &quot;&quot;,
@@ -43,23 +30,24 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/akhil/code/office&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_interpreter_path&quot;: &quot;/home/akhil/.nvm/versions/node/v20.17.0/bin/node&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;,
-    &quot;ts.external.directory.path&quot;: &quot;/home/akhil/code/office/node_modules/typescript/lib&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "full.screen.before.presentation.mode": "false",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "/home/akhil/code/office",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_interpreter_path": "/home/akhil/.nvm/versions/node/v20.17.0/bin/node",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "preferences.lookFeel",
+    "ts.external.directory.path": "/home/akhil/code/office/node_modules/typescript/lib",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -88,6 +76,11 @@
       <workItem from="1731567278496" duration="28000" />
       <workItem from="1731602892939" duration="65000" />
       <workItem from="1731603426992" duration="5000" />
+      <workItem from="1731674167081" duration="1195000" />
+      <workItem from="1731676805872" duration="2661000" />
+      <workItem from="1731728344149" duration="701000" />
+      <workItem from="1731734979820" duration="1570000" />
+      <workItem from="1731744888310" duration="733000" />
     </task>
     <servers />
   </component>
