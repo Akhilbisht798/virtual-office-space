@@ -30,7 +30,10 @@ func WebSocketHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleConnection(conn *websocket.Conn) {
-	defer conn.Close()
+	defer func() {
+		Rooms.RemoveUserFromRoom(conn)
+		conn.Close()
+	}()
 
 	for {
 		messageType, message, err := conn.ReadMessage()

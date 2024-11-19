@@ -1,12 +1,6 @@
 import Phaser from "phaser";
-import Player from "./Player.js";
 import { getSocketInstance } from "../../hooks/useSocket";
 
-// Maybe player are already in the room.
-// Maybe they join later.
-// so we need to have this class to manage the players
-// So I need to display spirte at a certain x,y coordinates.
-// this can change on socket update.
 class GameScene extends Phaser.Scene {
   static SCENE_KEY = "GameScene";
   constructor() {
@@ -15,7 +9,7 @@ class GameScene extends Phaser.Scene {
     this.cursors;
     this.players = {};
     this.ws;
-    this.prevX = 30;
+    this.prevX = 80;
     this.prevY = 30;
     this.roomId = "90"
     this.userId;
@@ -141,10 +135,9 @@ class GameScene extends Phaser.Scene {
           this.userJoin(payload)
           break;
         case "user-left":
-          console.log(payload);
+          this.userLeft(payload)
           break;
         case "movement":
-          console.log(payload);
           this.movement(payload)
           break;
         case "movement-rejected":
@@ -153,7 +146,7 @@ class GameScene extends Phaser.Scene {
       }
     };
     this.ws.onclose = () => {
-      console.log("disconnected from socket server.")
+      console.log("Socket disconnect")
     }
     this.cursor = this.input.keyboard.createCursorKeys();
   }
@@ -206,25 +199,23 @@ class GameScene extends Phaser.Scene {
     console.log("user should spawn at: ", spawn.x, spawn.y)
 
     users.forEach(u => {
-      // const p = this.physics.add.sprite("run", u.x, u.y)
       const p = this.physics.add.sprite(u.x, u.y, "run")
       p.play("idle", true)
       this.players[u.userId] = p
     });
-    // this.player.x = spawn.x
-    // this.player.y = spawn.y
-    // this.player.setPosition(spawn.x, spawn.y)
-    console.log("You joined: ", this.players)
+    this.player.x = spawn.x
+    this.player.y = spawn.y
   }
 
   userJoin(payload) {
     const p = this.physics.add.sprite(payload.x, payload.y, "run")
     this.players[payload.userId] = p
-    console.log("current users on the lobby: ", this.players)
   }
 
   userLeft(payload) {
-    this.players.delete(payload.userId)
+    const uId = payload["userId"]
+    this.players[uId].destroy()
+    delete this.players[uId]
   }
 
   movement(payload) {

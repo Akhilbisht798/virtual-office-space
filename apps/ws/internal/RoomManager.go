@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"encoding/json"
 	"log"
 	"sync"
 
@@ -56,17 +57,34 @@ func (rm *RoomManager) GetUsersInRoom(roomID string, currentUserId string) []Use
 	return users
 }
 
-func (rm *RoomManager) RemoveUserFromRoom(roomID string, userID string) {
+func (rm *RoomManager) RemoveUserFromRoom(conn *websocket.Conn) {
 	rm.mu.Lock()
 	defer rm.mu.Unlock()
 
-	if room, exists := rm.rooms[roomID]; exists {
-		if user, exists := room[userID]; exists {
-			user.conn.Close()
-		}
-		delete(room, userID)
-		if len(room) == 0 {
-			delete(rm.rooms, roomID)
+	for room, users := range rm.rooms {
+		for userId, user := range users {
+			log.Println(user.Id)
+			if user.conn == conn {
+				log.Println("userId to be removed: ", user.Id)
+				message := Message{
+					Type: "user-left",
+					Payload: map[string]interface{}{
+						"userId": user.Id,
+					},
+				}
+				delete(users, userId)
+
+				if len(users) == 0 {
+					delete(rm.rooms, room)
+				}
+				jsonMessage, err := json.Marshal(message)
+				if err != nil {
+					log.Println(err)
+					return
+				}
+				rm.BroadcastToRoom(room, user.Id, jsonMessage)
+				return
+			}
 		}
 	}
 }
