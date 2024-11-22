@@ -4,22 +4,21 @@ import (
 	"log"
 	"os"
 
-	"gorm.io/driver/postgres"
+	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
 // User model
 type User struct {
-	ID       string  `gorm:"primaryKey;unique;default:uuid_generate_v4()"` // Use uuid_generate_v4() or equivalent for cuid
+	ID       string  `gorm:"primaryKey;unique;default:(uuid())"` // Use (uuid()) or equivalent for cuid
 	Username string  `gorm:"unique;not null"`
 	Password string  `gorm:"unique;not null"`
 	AvatarID *string `gorm:"default:null"` // Nullable field
-	Role     Role    `gorm:"type:role"`    // Enum reference
 }
 
 // Space model
 type Space struct {
-	ID        string  `gorm:"primaryKey;unique;default:uuid_generate_v4()"`
+	ID        string  `gorm:"primaryKey;unique;default:(uuid())"`
 	Name      string  `gorm:"not null"`
 	Width     int     `gorm:"not null"`
 	Height    *int    `gorm:"default:null"` // Nullable field
@@ -28,7 +27,7 @@ type Space struct {
 
 // SpaceElement model
 type SpaceElement struct {
-	ID        string `gorm:"primaryKey;unique;default:uuid_generate_v4()"`
+	ID        string `gorm:"primaryKey;unique;default:(uuid())"`
 	ElementID string `gorm:"not null"`
 	SpaceID   string `gorm:"not null"`
 	X         int    `gorm:"not null"`
@@ -37,7 +36,7 @@ type SpaceElement struct {
 
 // Element model
 type Element struct {
-	ID       string `gorm:"primaryKey;unique;default:uuid_generate_v4()"`
+	ID       string `gorm:"primaryKey;unique;default:(uuid())"`
 	Width    int    `gorm:"not null"`
 	Height   int    `gorm:"not null"`
 	ImageURL string `gorm:"not null"`
@@ -45,7 +44,7 @@ type Element struct {
 
 // Map model
 type Map struct {
-	ID     string `gorm:"primaryKey;unique;default:uuid_generate_v4()"`
+	ID     string `gorm:"primaryKey;unique;default:(uuid())"`
 	Width  int    `gorm:"not null"`
 	Height int    `gorm:"not null"`
 	Name   string `gorm:"not null"`
@@ -53,7 +52,7 @@ type Map struct {
 
 // MapElement model
 type MapElement struct {
-	ID        string  `gorm:"primaryKey;unique;default:uuid_generate_v4()"`
+	ID        string  `gorm:"primaryKey;unique;default:(uuid())"`
 	MapID     string  `gorm:"not null"`
 	ElementID *string `gorm:"default:null"` // Nullable field
 	X         *int    `gorm:"default:null"` // Nullable field
@@ -62,18 +61,10 @@ type MapElement struct {
 
 // Avatar model
 type Avatar struct {
-	ID       string  `gorm:"primaryKey;unique;default:uuid_generate_v4()"`
+	ID       string  `gorm:"primaryKey;unique;default:(uuid())"`
 	ImageURL *string `gorm:"default:null"` // Nullable field
 	Name     *string `gorm:"default:null"` // Nullable field
 }
-
-// Role enum type
-type Role string
-
-const (
-	Admin  Role = "Admin"
-	Client Role = "User"
-)
 
 // GORM requires an `AutoMigrate` function to initialize models
 func Migrate(db *gorm.DB) error {
@@ -88,10 +79,12 @@ func Migrate(db *gorm.DB) error {
 	)
 }
 
+var Database *gorm.DB
+
 func ConnectDB() error {
 	dbUrl := os.Getenv("DB_URL")
 	db, err := gorm.Open(
-		postgres.Open(dbUrl),
+		mysql.Open(dbUrl),
 		&gorm.Config{},
 	)
 	if err != nil {
@@ -103,5 +96,6 @@ func ConnectDB() error {
 		log.Println(err)
 		return err
 	}
+	Database = db
 	return nil
 }
