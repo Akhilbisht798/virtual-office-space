@@ -11,7 +11,7 @@ class GameScene extends Phaser.Scene {
     this.ws;
     this.prevX = 80;
     this.prevY = 30;
-    this.roomId = "90"
+    this.roomId = "90";
     this.userId;
   }
   preload() {
@@ -95,7 +95,7 @@ class GameScene extends Phaser.Scene {
     if (collisionLayer) {
       this.physics.add.collider(this.player, collisionLayer);
     }
-    console.log("Create function done.")
+    console.log("Create function done.");
 
     this.cameras.main.startFollow(this.player);
     this.cameras.main.setZoom(2.4);
@@ -106,39 +106,41 @@ class GameScene extends Phaser.Scene {
       this.map.heightInPixels,
     );
 
-    this.ws = getSocketInstance()
+    this.ws = getSocketInstance();
     this.ws.onopen = () => {
       console.log("connected to socket server");
-      const userId = "userID-" + Math.floor(Math.random() * 100).toString()
-      this.userId = userId
-      console.log(userId)
-      this.ws.send(JSON.stringify({
-        type: "join",
-        payload: {
-          roomId: this.roomId,
-          userId: userId,
-          x: this.prevX,
-          y: this.prevY,
-        },
-      }));
-    }
+      const userId = "userID-" + Math.floor(Math.random() * 100).toString();
+      this.userId = userId;
+      console.log(userId);
+      this.ws.send(
+        JSON.stringify({
+          type: "join",
+          payload: {
+            roomId: this.roomId,
+            userId: userId,
+            x: this.prevX,
+            y: this.prevY,
+          },
+        }),
+      );
+    };
     this.ws.onmessage = (message) => {
       const data = JSON.parse(message.data);
       const type = data["type"];
       const payload = data["payload"];
       switch (type) {
         case "space-joined":
-          console.log("Space Joined working")
-          this.spaceJoined(payload)
+          console.log("Space Joined working");
+          this.spaceJoined(payload);
           break;
         case "user-join":
-          this.userJoin(payload)
+          this.userJoin(payload);
           break;
         case "user-left":
-          this.userLeft(payload)
+          this.userLeft(payload);
           break;
         case "movement":
-          this.movement(payload)
+          this.movement(payload);
           break;
         case "movement-rejected":
           console.log(payload);
@@ -146,8 +148,8 @@ class GameScene extends Phaser.Scene {
       }
     };
     this.ws.onclose = () => {
-      console.log("Socket disconnect")
-    }
+      console.log("Socket disconnect");
+    };
     this.cursor = this.input.keyboard.createCursorKeys();
   }
 
@@ -157,15 +159,17 @@ class GameScene extends Phaser.Scene {
     if (this.prevX !== this.player.x || this.prevY !== this.player.y) {
       this.prevX = this.player.x;
       this.prevY = this.player.y;
-      this.ws.send(JSON.stringify({
-        type: "move",
-        payload: {
-          roomId: this.roomId,
-          userId: this.userId,
-          x: this.player.x,
-          y: this.player.y,
-        }
-      }))
+      this.ws.send(
+        JSON.stringify({
+          type: "move",
+          payload: {
+            roomId: this.roomId,
+            userId: this.userId,
+            x: this.player.x,
+            y: this.player.y,
+          },
+        }),
+      );
     }
 
     this.player.setVelocity(0);
@@ -194,28 +198,28 @@ class GameScene extends Phaser.Scene {
   }
 
   spaceJoined(payload) {
-    const spawn = payload["spawn"]
-    const users = payload["users"]
-    console.log("user should spawn at: ", spawn.x, spawn.y)
+    const spawn = payload["spawn"];
+    const users = payload["users"];
+    console.log("user should spawn at: ", spawn.x, spawn.y);
 
-    users.forEach(u => {
-      const p = this.physics.add.sprite(u.x, u.y, "run")
-      p.play("idle", true)
-      this.players[u.userId] = p
+    users.forEach((u) => {
+      const p = this.physics.add.sprite(u.x, u.y, "run");
+      p.play("idle", true);
+      this.players[u.userId] = p;
     });
-    this.player.x = spawn.x
-    this.player.y = spawn.y
+    this.player.x = spawn.x;
+    this.player.y = spawn.y;
   }
 
   userJoin(payload) {
-    const p = this.physics.add.sprite(payload.x, payload.y, "run")
-    this.players[payload.userId] = p
+    const p = this.physics.add.sprite(payload.x, payload.y, "run");
+    this.players[payload.userId] = p;
   }
 
   userLeft(payload) {
-    const uId = payload["userId"]
-    this.players[uId].destroy()
-    delete this.players[uId]
+    const uId = payload["userId"];
+    this.players[uId].destroy();
+    delete this.players[uId];
   }
 
   movement(payload) {
@@ -223,7 +227,7 @@ class GameScene extends Phaser.Scene {
   }
 
   movementRejected(payload) {
-    this.player.setPosition(payload.x, payload.y)
+    this.player.setPosition(payload.x, payload.y);
   }
 }
 
