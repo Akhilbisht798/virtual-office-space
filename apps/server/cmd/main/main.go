@@ -22,6 +22,8 @@ func main() {
 	r.HandleFunc("/api/v1/signup", apis.SignUp)
 	r.HandleFunc("/api/v1/signin", apis.SignIn)
 
+	r.HandleFunc("/api/v1/createroom", apis.CreateRoom)
+
 	log.Println("Server Listening at Port: 8080")
 	log.Fatal(http.ListenAndServe(":8080", r))
 }
