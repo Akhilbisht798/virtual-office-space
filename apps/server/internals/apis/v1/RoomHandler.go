@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"reflect"
 
 	"github.com/Akhilbisht798/office/server/internals/db"
 	"github.com/go-playground/validator"
@@ -13,8 +14,9 @@ import (
 type CreateRoomRequest struct {
 	Name      string `json:"name" validate:"required"`
 	MapId     string `json:"mapId" validate:"required"`
-	Thumbnail string `json:"thumbnail`
+	Thumbnail string `json:"thumbnail"`
 	Public    bool   `json:"public"`
+	UserID    string `json:"userID" validate:"required"`
 }
 
 func CreateRoom(w http.ResponseWriter, r *http.Request) {
@@ -36,6 +38,7 @@ func CreateRoom(w http.ResponseWriter, r *http.Request) {
 		ReturnError(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+	log.Println("Type of Public: ", reflect.TypeOf(data.Public))
 
 	room := db.Space{
 		ID:        uuid.New().String(),
@@ -43,7 +46,9 @@ func CreateRoom(w http.ResponseWriter, r *http.Request) {
 		MapID:     data.MapId,
 		Public:    data.Public,
 		Thumbnail: &data.Thumbnail,
+		UserID:    data.UserID,
 	}
+	log.Printf("Room to be saved: %+v\n", room)
 
 	result := db.Database.Create(&room)
 	if result.Error != nil {
@@ -104,6 +109,7 @@ func GetAllRoom(w http.ResponseWriter, r *http.Request) {
 		ReturnError(w, "use post method", http.StatusBadRequest)
 		return
 	}
+
 	var spaces []db.Space
 	result := db.Database.Where("public = ?", true).Find(&spaces)
 	if result.Error != nil {
@@ -111,13 +117,21 @@ func GetAllRoom(w http.ResponseWriter, r *http.Request) {
 		ReturnError(w, result.Error.Error(), http.StatusBadRequest)
 		return
 	}
-	log.Println("fetched spaces: ", spaces)
+
+	log.Printf("fetched spaces: %#v", spaces)
+	response := map[string]interface{}{
+		"spaces": spaces,
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(map[string]string{
-		"userId": "success",
-	})
+	err := json.NewEncoder(w).Encode(response)
+
+	if err != nil {
+		log.Println("Error: ", err.Error())
+		ReturnError(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 }
 
 //func JoinRoom(w http.ResponseWriter, r *http.Request) {

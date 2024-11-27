@@ -14,6 +14,7 @@ type User struct {
 	Username string  `gorm:"unique;not null"`
 	Password string  `gorm:"unique;not null"`
 	AvatarID *string `gorm:"default:null"` // Nullable field
+	Spaces   []Space `gorm:"foreignKey:UserID"`
 }
 
 // Map model
@@ -29,7 +30,8 @@ type Space struct {
 	Name      string  `gorm:"not null"`
 	Thumbnail *string `gorm:"default:null"` // Nullable field
 	MapID     string  `gorm:"type:varchar(255);not null"`
-	Public    bool    `gorm:"default:true"`
+	UserID    string  `gorm:"type:varchar(255);not null"`
+	Public    bool    `gorm:"not null"`
 }
 
 // Avatar model
