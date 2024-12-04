@@ -141,7 +141,7 @@ type JoinRoomRequest struct {
 }
 
 func JoinRoom(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "GET" {
+	if r.Method != "POST" {
 		ReturnError(w, "use post method", http.StatusBadRequest)
 		return
 	}

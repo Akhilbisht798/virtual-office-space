@@ -14,21 +14,28 @@ class GameScene extends Phaser.Scene {
     this.roomId = "90";
     this.userId;
   }
+
+  init(data) {
+    this.files = data.files;
+    this.mapName;
+    for (let key in this.files) {
+      const keyArr = key.split("/")
+      this.mapName = keyArr[0]
+      break
+    }
+  }
+
   preload() {
-    this.load.tilemapTiledJSON("map", "assets/map.json");
-    this.load.image(
-      "flower",
-      "assets/Pixel 16 Village/Fences/flower fence.png",
-    );
-    this.load.image("wood", "assets/Pixel 16 Village/Fences/wooden fence.png");
-    this.load.image(
-      "floor",
-      "assets/Pixel 16 Village/Walls & Floor Tiles [Update 1.1]/floor-tiles.png",
-    );
-    this.load.image(
-      "walls",
-      "assets/Pixel 16 Village/Walls & Floor Tiles [Update 1.1]/walls.png",
-    );
+    const jsonKeys = Object.keys(this.files).filter(key => key.endsWith('.json'));
+    const mapJson = this.files[jsonKeys[0]];
+    const map = JSON.parse(mapJson)
+    
+    this.load.tilemapTiledJSON("map", map);
+
+    map.tilesets.forEach(tileset => {
+      const assetFileURl = this.mapName + tileset.image;
+      this.load.image(tileset.name, this.files[assetFileURl])
+    });
 
     this.load.spritesheet("run", "assets/spirite/Run.png", {
       frameWidth: 42,
@@ -43,12 +50,9 @@ class GameScene extends Phaser.Scene {
   create() {
     const map = this.make.tilemap({ key: "map" });
     this.map = map;
-    const tileset = {
-      walls: map.addTilesetImage("walls", "walls"),
-      floor: map.addTilesetImage("floor-tiles", "floor"),
-      wood: map.addTilesetImage("wooden fence", "wood"),
-      flower: map.addTilesetImage("flower fence", "flower"),
-    };
+    const tilesets = this.map.tilesets.map(tileset => {
+      return this.map.addTilesetImage(tileset.name, tileset.name)
+    })
 
     let collisionLayer;
 
@@ -56,13 +60,13 @@ class GameScene extends Phaser.Scene {
       try {
         const createLayer = map.createLayer(
           layer.name,
-          [tileset.floor, tileset.walls, tileset.wood, tileset.flower],
+          tilesets,
           0,
           0,
         );
         if (layer.name === "boundary") {
-          console.log("collision layer");
           collisionLayer = createLayer;
+          console.log(collisionLayer)
           createLayer.setCollisionByExclusion([-1]);
         }
       } catch (error) {
