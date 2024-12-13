@@ -113,17 +113,17 @@ class GameScene extends Phaser.Scene {
     this.ws = getSocketInstance();
     this.ws.onopen = () => {
       console.log("connected to socket server");
-      const userId = "userID-" + Math.floor(Math.random() * 100).toString();
-      this.userId = userId;
-      console.log(userId);
+
+      const token = localStorage.getItem("jwt")
+
       this.ws.send(
         JSON.stringify({
           type: "join",
           payload: {
             roomId: this.roomId,
-            userId: userId,
             x: this.prevX,
             y: this.prevY,
+            jwt: token,
           },
         }),
       );
@@ -204,7 +204,11 @@ class GameScene extends Phaser.Scene {
   spaceJoined(payload) {
     const spawn = payload["spawn"];
     const users = payload["users"];
-    console.log("user should spawn at: ", spawn.x, spawn.y);
+    this.userId = payload["userId"]
+    const sprite = payload["sprite"]
+    console.log("sprite ", sprite)
+    console.log(this.userId)
+    console.log("users: ", users)
 
     users.forEach((u) => {
       const p = this.physics.add.sprite(u.x, u.y, "run");

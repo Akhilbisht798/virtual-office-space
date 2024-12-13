@@ -9,22 +9,36 @@ import (
 )
 
 type RoomManager struct {
-	rooms map[string]map[string]*User // Map of roomID -> map of userID -> User
-	mu    sync.RWMutex                // Mutex for thread-safe operations
+	rooms map[string]map[string]*UserConn // Map of roomID -> map of userID -> User
+	mu    sync.RWMutex                    // Mutex for thread-safe operations
 }
 
 func NewRoomManager() *RoomManager {
 	return &RoomManager{
-		rooms: make(map[string]map[string]*User),
+		rooms: make(map[string]map[string]*UserConn),
 	}
 }
 
-func (rm *RoomManager) AddUserToRoom(roomID string, user *User) {
+func (rm *RoomManager) PrintUsersInRoom(roomID string) {
+	users, exists := rm.rooms[roomID]
+	if !exists {
+		log.Printf("Room with ID '%s' does not exist.\n", roomID)
+		return
+	}
+
+	log.Printf("Users in room '%s':\n", roomID)
+	log.Println("Number of users: ", len(users))
+	for userID, _ := range users {
+		log.Printf("- UserID: %s\n", userID)
+	}
+}
+
+func (rm *RoomManager) AddUserToRoom(roomID string, user *UserConn) {
 	rm.mu.Lock()
 	defer rm.mu.Unlock()
 
 	if _, exists := rm.rooms[roomID]; !exists {
-		rm.rooms[roomID] = make(map[string]*User)
+		rm.rooms[roomID] = make(map[string]*UserConn)
 	}
 	rm.rooms[roomID][user.Id] = user
 	log.Printf("Added User %s to Room %s", user.Id, roomID)
@@ -34,6 +48,7 @@ type UserPosition struct {
 	UserId string  `json:"userId"`
 	X      float64 `json:"x"`
 	Y      float64 `json:"y"`
+	Sprite string  `json:"sprite"`
 }
 
 // Return [{ userId, x, y }, { userId, x, y }]
@@ -51,6 +66,7 @@ func (rm *RoomManager) GetUsersInRoom(roomID string, currentUserId string) []Use
 				UserId: user.Id,
 				X:      float64(user.X),
 				Y:      float64(user.Y),
+				Sprite: user.Sprite,
 			})
 		}
 	}

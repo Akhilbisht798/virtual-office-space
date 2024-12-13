@@ -21,12 +21,12 @@ func main() {
 	r := mux.NewRouter()
 
 	r.HandleFunc("/api/v1/signup", middleware.ApplyMiddleware(apis.SignUp, middleware.EnableCORS))
-	r.HandleFunc("/api/v1/signin", middleware.ApplyMiddleware(apis.SignIn))
+	r.HandleFunc("/api/v1/signin", middleware.ApplyMiddleware(apis.SignIn, middleware.EnableCORS))
 
-	r.HandleFunc("/api/v1/createroom", middleware.ApplyMiddleware(apis.CreateRoom, middleware.EnableCORS, middleware.AuthMiddleware))
-	r.HandleFunc("/api/v1/deleteroom", middleware.ApplyMiddleware(apis.DeleteRoom, middleware.EnableCORS, middleware.AuthMiddleware))
-	r.HandleFunc("/api/v1/getrooms", middleware.ApplyMiddleware(apis.GetAllRoom, middleware.EnableCORS, middleware.AuthMiddleware))
-	r.HandleFunc("/api/v1/joinroom", middleware.ApplyMiddleware(apis.JoinRoom, middleware.EnableCORS, middleware.AuthMiddleware))
+	r.HandleFunc("/api/v1/createroom", middleware.ApplyMiddleware(apis.CreateRoom, middleware.EnableCORS))
+	r.HandleFunc("/api/v1/deleteroom", middleware.ApplyMiddleware(apis.DeleteRoom, middleware.EnableCORS))
+	r.HandleFunc("/api/v1/getrooms", middleware.ApplyMiddleware(apis.GetAllRoom, middleware.EnableCORS))
+	r.HandleFunc("/api/v1/joinroom", middleware.ApplyMiddleware(apis.JoinRoom, middleware.EnableCORS))
 
 	log.Println("Server Listening at Port: 8080")
 	log.Fatal(http.ListenAndServe(":8080", r))

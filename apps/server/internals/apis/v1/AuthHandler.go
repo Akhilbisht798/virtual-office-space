@@ -53,9 +53,11 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	avatarId := "avatar id- random"
 	user := db.User{
 		Username: data.Username,
 		Password: string(hasedPassword),
+		AvatarID: &avatarId,
 	}
 
 	result := db.Database.Create(&user)

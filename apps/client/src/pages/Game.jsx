@@ -85,7 +85,6 @@ const Game = () => {
     let game;
     async function start() {
       const files = await getAssets();
-      //console.log("Files in game: ", files);
 
       const config = {
         type: Phaser.CANVAS,
