@@ -27,24 +27,19 @@ func join(conn *websocket.Conn, payload map[string]interface{}) {
 	claims := token.Claims.(*jwt.StandardClaims)
 	id := claims.Issuer
 
-	dbUser, err := GetUser(id)
+	sprite, err := GetUser(id)
 	if err != nil {
 		log.Println("Error Getting User: ", err.Error())
 		return
 	}
-	log.Println(dbUser.AvatarID)
+	log.Println("user sprite: ", sprite)
 
 	user := &UserConn{
-		conn: conn,
-		Id:   id,
-		X:    payload["x"].(float64),
-		Y:    payload["y"].(float64),
-	}
-
-	if dbUser.AvatarID != nil {
-		user.Sprite = *dbUser.AvatarID
-	} else {
-		user.Sprite = ""
+		conn:   conn,
+		Id:     id,
+		X:      payload["x"].(float64),
+		Y:      payload["y"].(float64),
+		Sprite: sprite,
 	}
 
 	log.Printf("user to be added: %+v\n", user)

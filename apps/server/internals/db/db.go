@@ -15,16 +15,17 @@ type User struct {
 	Password string  `gorm:"unique;not null"`
 	AvatarID *string `gorm:"default:null"` // Nullable field
 	Spaces   []Space `gorm:"foreignKey:UserID"`
+	Avatar   Avatar  `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }
 
-// Map model
+// Maps from which spaces will be created
 type Map struct {
 	ID     string  `gorm:"type:varchar(255);primaryKey;unique;default:(uuid())"`
 	Name   string  `gorm:"type:varchar(255);not null;unique"`
 	Spaces []Space `gorm:"foreignKey:MapID"`
 }
 
-// Space model
+// Space or room created by a certain user to join to.
 type Space struct {
 	ID        string  `gorm:"type:varchar(255);primaryKey;unique;default:(uuid())"`
 	Name      string  `gorm:"not null"`
@@ -34,11 +35,10 @@ type Space struct {
 	Public    bool    `gorm:"not null"`
 }
 
-// Avatar model
+// Avatar
 type Avatar struct {
-	ID       string `gorm:"type:varchar(255);primaryKey;unique;default:(uuid())"`
-	ImageURL string `gorm:"default:null"` // Nullable field
-	Name     string `gorm:"default:null"` // Nullable field
+	ID   string `gorm:"type:varchar(255);primaryKey;unique;default:(uuid())"`
+	Name string `gorm:"unique;not null"` // Nullable field
 }
 
 // GORM requires an `AutoMigrate` function to initialize models

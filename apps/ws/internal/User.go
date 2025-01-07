@@ -1,12 +1,15 @@
 package internal
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
 	"log"
+	"net/http"
 	"os"
 
 	"github.com/gorilla/websocket"
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
 )
 
 type UserConn struct {
@@ -17,46 +20,42 @@ type UserConn struct {
 	Sprite string  `json:"sprite"`
 }
 
-type User struct {
-	ID       string  `gorm:"type:varchar(255);primaryKey;unique;default:(uuid())"` // Use (uuid()) or equivalent for cuid
-	Username string  `gorm:"unique;not null"`
-	Password string  `gorm:"unique;not null"`
-	AvatarID *string `gorm:"default:null"` // Nullable field
+type GetUserSpriteRequest struct {
+	UserID string `json:"userID"`
 }
 
-func GetUser(userId string) (User, error) {
-	var user User
-	db, err := ConnectDB()
+type GetSpriteResponse struct {
+	Sprite string `json:"sprite"`
+}
+
+func GetUser(userId string) (string, error) {
+	serverUrl := os.Getenv("SERVER")
+	if serverUrl == "" {
+		return "", errors.New("server url not found in the env")
+	}
+	url := serverUrl + "/api/v1/getSprite"
+	payload := GetUserSpriteRequest{
+		UserID: userId,
+	}
+	jsonData, err := json.Marshal(payload)
 	if err != nil {
-		log.Println(err)
-		return user, err
+		return "", err
 	}
-	res := db.Where("id = ?", userId).First(&user)
-	if res.Error != nil {
-		log.Println(res.Error)
-		return user, res.Error
-	}
-	return user, nil
-}
 
-func ConnectDB() (*gorm.DB, error) {
-	dbUrl := os.Getenv("DB_URL")
-	db, err := gorm.Open(
-		mysql.Open(dbUrl),
-		&gorm.Config{},
-	)
+	resp, err := http.Post(url, "application/json", bytes.NewBuffer(jsonData))
 	if err != nil {
-		log.Println(err)
-		return nil, err
+		log.Println(err.Error())
+		return "", err
 	}
-	return db, nil
-}
 
-// User model
-//type User struct {
-//	ID       string  `gorm:"type:varchar(255);primaryKey;unique;default:(uuid())"` // Use (uuid()) or equivalent for cuid
-//	Username string  `gorm:"unique;not null"`
-//	Password string  `gorm:"unique;not null"`
-//	AvatarID *string `gorm:"default:null"` // Nullable field
-//	Spaces   []Space `gorm:"foreignKey:UserID"`
-//}
+	defer resp.Body.Close()
+
+	var data GetSpriteResponse
+	err = json.NewDecoder(resp.Body).Decode(&data)
+	if err != nil {
+		log.Println(err.Error())
+		return "", err
+	}
+	fmt.Println("Sprite is: ", data.Sprite)
+	return data.Sprite, nil
+}

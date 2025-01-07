@@ -68,7 +68,7 @@ const Game = () => {
     const url = SERVER + "/api/v1/joinroom";
 
     const data = {
-      roomID: "0ebe94aa-eb7a-470f-bf78-a562d2a7bd4e",
+      roomID: "76417741-22c4-42d8-8d0f-3ad0a3f7c27b",
     };
 
     try {

@@ -28,6 +28,9 @@ func main() {
 	r.HandleFunc("/api/v1/getrooms", middleware.ApplyMiddleware(apis.GetAllRoom, middleware.EnableCORS))
 	r.HandleFunc("/api/v1/joinroom", middleware.ApplyMiddleware(apis.JoinRoom, middleware.EnableCORS))
 
+	r.HandleFunc("/api/v1/getSprite", middleware.ApplyMiddleware(apis.GetSprite, middleware.EnableCORS))
+	r.HandleFunc("/api/v1/uploadSprite", middleware.ApplyMiddleware(apis.UploadSprite, middleware.EnableCORS))
+
 	log.Println("Server Listening at Port: 8080")
 	log.Fatal(http.ListenAndServe(":8080", r))
 }
