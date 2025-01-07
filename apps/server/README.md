@@ -12,3 +12,9 @@ docker run -d --name minio \
   -e "MINIO_ROOT_PASSWORD=password" \
   quay.io/minio/minio server /data --console-address ":9001"
 
+
+
+- Start both minio server or s3 and a database put the map in minio so it can import that.
+- should have entry for the map and the room and should have it on s3 in zip form (later automate it).
+- Maps stored :- maps/map1.zip maps/map2.zip etc.
+- Make a database entry for that map.

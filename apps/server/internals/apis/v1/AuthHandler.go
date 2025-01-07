@@ -53,9 +53,12 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//TODO: get avatarid from the database;
+	avatarId := "0349d137-cc00-11ef-bf0f-0242ac110003"
 	user := db.User{
 		Username: data.Username,
 		Password: string(hasedPassword),
+		AvatarID: &avatarId,
 	}
 
 	result := db.Database.Create(&user)

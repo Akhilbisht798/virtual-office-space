@@ -3,19 +3,46 @@ package internal
 import (
 	"encoding/json"
 	"log"
+	"os"
 
+	"github.com/dgrijalva/jwt-go/v4"
 	"github.com/gorilla/websocket"
 )
 
 var Rooms *RoomManager
 
 func join(conn *websocket.Conn, payload map[string]interface{}) {
-	user := &User{
-		conn: conn,
-		Id:   payload["userId"].(string),
-		X:    payload["x"].(float64),
-		Y:    payload["y"].(float64),
+	log.Println("Secret is: ", os.Getenv("SECRET"))
+	cookie := payload["jwt"].(string)
+
+	token, err := jwt.ParseWithClaims(cookie, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte(os.Getenv("SECRET")), nil
+	})
+
+	if err != nil {
+		log.Println("Error with cookie: ", err.Error())
+		return
 	}
+
+	claims := token.Claims.(*jwt.StandardClaims)
+	id := claims.Issuer
+
+	sprite, err := GetUser(id)
+	if err != nil {
+		log.Println("Error Getting User: ", err.Error())
+		return
+	}
+	log.Println("user sprite: ", sprite)
+
+	user := &UserConn{
+		conn:   conn,
+		Id:     id,
+		X:      payload["x"].(float64),
+		Y:      payload["y"].(float64),
+		Sprite: sprite,
+	}
+
+	log.Printf("user to be added: %+v\n", user)
 	room := payload["roomId"].(string)
 
 	if Rooms == nil {
@@ -31,7 +58,9 @@ func join(conn *websocket.Conn, payload map[string]interface{}) {
 				"x": user.X,
 				"y": user.Y,
 			},
-			"users": Rooms.GetUsersInRoom(room, user.Id),
+			"userId": user.Id,
+			"sprite": user.Sprite,
+			"users":  Rooms.GetUsersInRoom(room, user.Id),
 		},
 	}
 	jsonMessage, err := json.Marshal(message)
@@ -48,6 +77,7 @@ func join(conn *websocket.Conn, payload map[string]interface{}) {
 			"userId": user.Id,
 			"x":      user.X,
 			"y":      user.Y,
+			"sprite": user.Sprite,
 		},
 	}
 	jsonMessage, err = json.Marshal(message)
@@ -64,25 +94,13 @@ func move(conn *websocket.Conn, payload map[string]interface{}) {
 	x := payload["x"].(float64)
 	y := payload["y"].(float64)
 
-	var user *User
+	var user *UserConn
 
 	if room, exists := Rooms.rooms[room]; exists {
 		if u, exists := room[userId]; exists {
 			user = u
 		}
 	}
-
-	// var xDisplacement = math.Abs(float64(user.X) - float64(x))
-	// var yDisplacement = math.Abs(float64(user.Y) - float64(y))
-	// log.Println("Working till here.")
-	// log.Printf("%v - %v", float64(user.X), float64(x))
-	// log.Printf("%v - %v", float64(user.Y), float64(y))
-
-	// Movement Rejected
-	// if xDisplacement > 2 || yDisplacement > 2 {
-	// 	return
-	// }
-	// log.Println("Working till here 2.")
 
 	user.X = float64(x)
 	user.Y = float64(y)

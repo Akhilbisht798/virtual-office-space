@@ -34,6 +34,27 @@ func GetPreSignedUrl(
 	return url, nil
 }
 
+func PutPreSignedUrl(
+	bucketName string, objecetKey string, lifetimeSecs int64) (*v4.PresignedHTTPRequest, error) {
+	s3Client, err := getS3Client()
+	if err != nil {
+		return nil, err
+	}
+	client := s3.NewPresignClient(&s3Client)
+	url, err := client.PresignPutObject(context.TODO(), &s3.PutObjectInput{
+		Bucket: aws.String(bucketName),
+		Key:    aws.String(objecetKey),
+	}, func(po *s3.PresignOptions) {
+		po.Expires = time.Duration(lifetimeSecs * int64(time.Minute))
+	})
+	if err != nil {
+		log.Printf("Could'nt get a Presigned request to get %v:%v, Here why: %v\n",
+			bucketName, objecetKey, err)
+		return nil, err
+	}
+	return url, nil
+}
+
 func getS3Client() (s3.Client, error) {
 	var client s3.Client
 	region := os.Getenv("REGION")
