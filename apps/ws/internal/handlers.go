@@ -97,7 +97,7 @@ func move(conn *websocket.Conn, payload map[string]interface{}) {
 	var user *UserConn
 
 	if room, exists := Rooms.rooms[room]; exists {
-		if u, exists := room[userId]; exists {
+		if u, exists := room.users[userId]; exists {
 			user = u
 		}
 	}

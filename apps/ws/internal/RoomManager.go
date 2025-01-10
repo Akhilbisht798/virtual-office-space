@@ -8,27 +8,32 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+type Room struct {
+	users map[string]*UserConn // Map of user -> User.
+	mu    sync.RWMutex
+}
+
 type RoomManager struct {
-	rooms map[string]map[string]*UserConn // Map of roomID -> map of userID -> User
-	mu    sync.RWMutex                    // Mutex for thread-safe operations
+	rooms map[string]*Room // Map of roomID -> map of userID -> User
+	mu    sync.RWMutex     // Mutex for thread-safe operations
 }
 
 func NewRoomManager() *RoomManager {
 	return &RoomManager{
-		rooms: make(map[string]map[string]*UserConn),
+		rooms: make(map[string]*Room),
 	}
 }
 
 func (rm *RoomManager) PrintUsersInRoom(roomID string) {
-	users, exists := rm.rooms[roomID]
+	room, exists := rm.rooms[roomID]
 	if !exists {
 		log.Printf("Room with ID '%s' does not exist.\n", roomID)
 		return
 	}
 
 	log.Printf("Users in room '%s':\n", roomID)
-	log.Println("Number of users: ", len(users))
-	for userID, _ := range users {
+	log.Println("Number of users: ", len(room.users))
+	for userID, _ := range room.users {
 		log.Printf("- UserID: %s\n", userID)
 	}
 }
@@ -38,10 +43,13 @@ func (rm *RoomManager) AddUserToRoom(roomID string, user *UserConn) {
 	defer rm.mu.Unlock()
 
 	if _, exists := rm.rooms[roomID]; !exists {
-		rm.rooms[roomID] = make(map[string]*UserConn)
+		createdRoom := Room{
+			users: make(map[string]*UserConn),
+		}
+		rm.rooms[roomID] = &createdRoom
 	}
-	rm.rooms[roomID][user.Id] = user
-	log.Printf("Added User %s to Room %s", user.Id, roomID)
+	rm.rooms[roomID].users[user.Id] = user
+	log.Printf(user.Id, roomID)
 }
 
 type UserPosition struct {
@@ -53,14 +61,14 @@ type UserPosition struct {
 
 // Return [{ userId, x, y }, { userId, x, y }]
 func (rm *RoomManager) GetUsersInRoom(roomID string, currentUserId string) []UserPosition {
-	rm.mu.RLock()
-	defer rm.mu.RUnlock()
+	rm.rooms[roomID].mu.Lock()
+	defer rm.rooms[roomID].mu.Unlock()
 
 	room := rm.rooms[roomID]
 
 	users := []UserPosition{}
 
-	for _, user := range room {
+	for _, user := range room.users {
 		if user.Id != currentUserId {
 			users = append(users, UserPosition{
 				UserId: user.Id,
@@ -73,12 +81,13 @@ func (rm *RoomManager) GetUsersInRoom(roomID string, currentUserId string) []Use
 	return users
 }
 
+// Deleting a room need optimization.
 func (rm *RoomManager) RemoveUserFromRoom(conn *websocket.Conn) {
 	rm.mu.Lock()
 	defer rm.mu.Unlock()
 
-	for room, users := range rm.rooms {
-		for userId, user := range users {
+	for roomId, room := range rm.rooms {
+		for userId, user := range room.users {
 			log.Println(user.Id)
 			if user.conn == conn {
 				log.Println("userId to be removed: ", user.Id)
@@ -88,17 +97,17 @@ func (rm *RoomManager) RemoveUserFromRoom(conn *websocket.Conn) {
 						"userId": user.Id,
 					},
 				}
-				delete(users, userId)
+				delete(rm.rooms[roomId].users, userId)
 
-				if len(users) == 0 {
-					delete(rm.rooms, room)
+				if len(rm.rooms[roomId].users) == 0 {
+					delete(rm.rooms, roomId)
 				}
 				jsonMessage, err := json.Marshal(message)
 				if err != nil {
 					log.Println(err)
 					return
 				}
-				rm.BroadcastToRoom(room, user.Id, jsonMessage)
+				rm.BroadcastToRoom(roomId, user.Id, jsonMessage)
 				return
 			}
 		}
@@ -111,7 +120,7 @@ func (rm *RoomManager) BroadcastToRoom(roomID string, userID string, message []b
 	// defer rm.mu.RUnlock()
 
 	if room, exists := rm.rooms[roomID]; exists {
-		for _, user := range room {
+		for _, user := range room.users {
 			if user.Id != userID {
 				err := user.conn.WriteMessage(websocket.TextMessage, message)
 				if err != nil {
