@@ -1,5 +1,6 @@
 import Phaser from "phaser";
 import { getSocketInstance } from "../../hooks/useSocket";
+import AgoraRTC from "agora-rtc-sdk-ng";
 
 class GameScene extends Phaser.Scene {
   static SCENE_KEY = "GameScene";
@@ -13,6 +14,16 @@ class GameScene extends Phaser.Scene {
     this.prevY = 30;
     this.roomId = "90";
     this.userId;
+    this.remoteVideo = {};
+
+    this.localTracks = {
+      videoTrack: null,
+      audioTrack: null,
+    };
+    this.agoraClient = null;
+    this.agoraAppID = "cc0e18c2f01c4227a22b79678726b652";
+    this.agoraToken = null;
+    this.agoraChannel = "test";
   }
 
   init(data) {
@@ -29,14 +40,13 @@ class GameScene extends Phaser.Scene {
     const jsonKeys = Object.keys(this.files).filter(key => key.endsWith('.json'));
     const mapJson = this.files[jsonKeys[0]];
     const map = JSON.parse(mapJson)
-    
+
     this.load.tilemapTiledJSON("map", map);
 
     map.tilesets.forEach(tileset => {
       const assetFileURl = this.mapName + tileset.image;
       this.load.image(tileset.name, this.files[assetFileURl])
     });
-
     this.load.spritesheet("run", "assets/spirite/Run.png", {
       frameWidth: 42,
       frameHeight: 42,
@@ -134,7 +144,6 @@ class GameScene extends Phaser.Scene {
       const payload = data["payload"];
       switch (type) {
         case "space-joined":
-          console.log("Space Joined working");
           this.spaceJoined(payload);
           break;
         case "user-join":
@@ -155,6 +164,9 @@ class GameScene extends Phaser.Scene {
       console.log("Socket disconnect");
     };
     this.cursor = this.input.keyboard.createCursorKeys();
+
+    //init agora here.
+    this.initAgora()
   }
 
   update() {
@@ -179,9 +191,9 @@ class GameScene extends Phaser.Scene {
     this.player.setVelocity(0);
     if (
       this.cursor.left.isDown ||
-      this.cursor.right.isDown ||
-      this.cursor.up.isDown ||
-      this.cursor.down.isDown
+        this.cursor.right.isDown ||
+        this.cursor.up.isDown ||
+        this.cursor.down.isDown
     ) {
       this.player.play("running", true);
     } else {
@@ -199,6 +211,103 @@ class GameScene extends Phaser.Scene {
     } else if (this.cursor.down.isDown) {
       this.player.setVelocityY(speed);
     }
+  }
+
+  async initAgora() {
+    this.agoraClient = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
+    this.agoraClient.on("user-published", async (user, mediaType) => {
+      await this.agoraClient.subscribe(user, mediaType)
+      if (mediaType === "video") {
+        console.log("remote users joined: ", user.uid)
+        await this.displayRemoteVideo(user)
+      }
+
+      if (mediaType === 'audio') {
+        user.audioTrack.play()
+      }
+    })
+
+    this.agoraClient.on("user-unpublished", async (user) => {
+      const video = document.getElementById(user.uid)
+      video && video.remove()
+      delete this.remoteVideo[user.uid]
+      console.log("remote user removed: ", user.uid)
+    })
+    await this.joinChannel()
+  }
+
+  async displayLocalVideo() {
+    console.log("Display local track method has been called.")
+    const video = document.createElement("video");
+    video.id = "local";
+    const stream = new MediaStream()
+    stream.addTrack(this.localTracks.videoTrack.getMediaStreamTrack());
+    video.srcObject = stream;
+    video.muted = true;
+    video.autoplay = true;
+    video.width = 160;
+    video.height = 120;
+    const videoContainer = document.getElementById("video-container");
+    if (videoContainer === null) {
+      const videoContainer = document.createElement("div");
+      videoContainer.id = "video-container";
+      videoContainer.style.position = "absolute";
+      videoContainer.style.right = "0";
+      videoContainer.style.top = "50%";
+      videoContainer.style.display = "flex";
+      videoContainer.style.flexDirection = "column";
+      videoContainer.style.alignItems = "center";
+      videoContainer.style.background = "rgba(0, 0, 0, 0.5)";
+      videoContainer.style.padding = "10px";
+
+      document.body.appendChild(videoContainer);
+    }
+
+    const container = document.getElementById("video-container");
+    container.appendChild(video);
+  }
+
+  async displayRemoteVideo(user) {
+    const video = document.createElement("video");
+    video.id = user.uid;
+    video.autoplay = true;
+    video.width = 160;
+    video.height = 120;
+    video.muted = true;
+
+    const videoContainer = document.getElementById("video-container");
+    if (videoContainer === null) {
+      const videoContainer = document.createElement("div");
+      videoContainer.id = "video-container";
+      videoContainer.style.position = "absolute";
+      videoContainer.style.right = "0";
+      videoContainer.style.top = "50%";
+      videoContainer.style.display = "flex";
+      videoContainer.style.flexDirection = "column";
+      videoContainer.style.alignItems = "center";
+      videoContainer.style.background = "rgba(0, 0, 0, 0.5)";
+      videoContainer.style.padding = "10px";
+
+      document.body.appendChild(videoContainer);
+    }
+
+    const container = document.getElementById("video-container");
+    container.appendChild(video);
+    user.videoTrack.play(video)
+    this.remoteVideo[user.uid] = video;
+  }
+
+  async createLocalTrack() {
+    this.localTracks.audioTrack = await AgoraRTC.createMicrophoneAudioTrack();
+    this.localTracks.videoTrack = await AgoraRTC.createCameraVideoTrack();
+    console.log("Local tracks recived")
+  }
+
+  async joinChannel() {
+    await this.agoraClient.join(this.agoraAppID, this.agoraChannel, null, 0);
+    await this.createLocalTrack();
+    await this.displayLocalVideo();
+    await this.agoraClient.publish([this.localTracks.videoTrack, this.localTracks.audioTrack]);
   }
 
   spaceJoined(payload) {
