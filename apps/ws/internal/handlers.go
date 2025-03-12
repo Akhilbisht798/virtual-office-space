@@ -10,6 +10,7 @@ import (
 )
 
 var Rooms *RoomManager
+var CallManager *Calls
 
 func join(conn *websocket.Conn, payload map[string]interface{}) {
 	log.Println("Secret is: ", os.Getenv("SECRET"))
@@ -120,4 +121,29 @@ func move(conn *websocket.Conn, payload map[string]interface{}) {
 		return
 	}
 	Rooms.BroadcastToRoom(room, userId, jsonMessage)
+}
+
+func makeCall(conn *websocket.Conn, payload map[string]interface{}) {
+	roomId := payload["roomId"].(string)
+	userId := payload["userId"].(string)
+	remoteUserId := payload["remoteUserId"].(string)
+	callId := payload["callId"].(string)
+
+	if CallManager == nil {
+		CallManager = NewCallManager()
+	}
+
+	CallManager.SendChannelID(conn, userId, remoteUserId, roomId, callId)
+	log.Printf("user %s wants to make a video call to user %s", userId, remoteUserId)
+}
+
+func callAccepted(conn *websocket.Conn, payload map[string]interface{}) {
+	channelID := payload["channelId"].(string)
+	userId := payload["userId"].(string)
+
+	if CallManager == nil {
+		CallManager = NewCallManager()
+	}
+
+	CallManager.CallAccepted(channelID, userId)
 }

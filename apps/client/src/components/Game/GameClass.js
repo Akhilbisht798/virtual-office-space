@@ -1,6 +1,7 @@
 import Phaser from "phaser";
 import { getSocketInstance } from "../../hooks/useSocket";
 import AgoraRTC from "agora-rtc-sdk-ng";
+import {v4 as uuidv4, v4} from "uuid";
 
 class GameScene extends Phaser.Scene {
   static SCENE_KEY = "GameScene";
@@ -23,7 +24,7 @@ class GameScene extends Phaser.Scene {
     this.agoraClient = null;
     this.agoraAppID = "cc0e18c2f01c4227a22b79678726b652";
     this.agoraToken = null;
-    this.agoraChannel = "test";
+    this.agoraChannel;
   }
 
   init(data) {
@@ -157,6 +158,8 @@ class GameScene extends Phaser.Scene {
           break;
         case "movement-rejected":
           console.log(payload);
+        case "call-req":
+          this.onCallRequest(payload)
           break;
       }
     };
@@ -171,6 +174,23 @@ class GameScene extends Phaser.Scene {
 
   update() {
     const speed = 160;
+
+    Object.values(this.players).forEach(player => {
+      if (player === this.player) return;
+      const distance = Math.sqrt(
+        Math.pow(this.player.x - player.x, 2) +
+        Math.pow(this.player.y - player.y, 2)
+      );
+      if (distance <= 40) {
+        console.log("Near each other")
+        this.showVideoCallBtn(player.userId)
+      } else {
+        const btn = document.getElementById("video-call-btn")
+        if (btn) {
+          btn.remove()
+        }
+      }
+    })
 
     if (this.prevX !== this.player.x || this.prevY !== this.player.y) {
       this.prevX = this.player.x;
@@ -233,7 +253,7 @@ class GameScene extends Phaser.Scene {
       delete this.remoteVideo[user.uid]
       console.log("remote user removed: ", user.uid)
     })
-    await this.joinChannel()
+    //await this.joinChannel()
   }
 
   async displayLocalVideo() {
@@ -297,6 +317,51 @@ class GameScene extends Phaser.Scene {
     this.remoteVideo[user.uid] = video;
   }
 
+  async showVideoCallBtn(userId) {
+    const checkBtn = document.getElementById("video-call-btn");
+    if (checkBtn) {
+      return;
+    }
+    const btn = document.createElement("button");
+    btn.id = "video-call-btn"
+    btn.innerText = "Call"
+    btn.style.position = "fixed"
+    btn.style.bottom = "20px"
+    btn.style.left = "50%"
+    btn.style.fontSize = "16px";
+    btn.style.padding = "10px 20px";
+    btn.style.cursor = "pointer";
+
+    btn.style.backgroundColor = "#007bff"; 
+    btn.style.color = "#fff";
+    btn.style.border = "none";
+    btn.style.borderRadius = "5px";
+
+    btn.addEventListener("click", () => {
+      console.log("Lets video call")
+      this.makeCall(userId)
+    });
+
+    document.body.appendChild(btn)
+  }
+
+  async makeCall(remoteUserId) {
+    console.log("Make a call")
+    const callID = uuidv4()
+    
+    this.ws.send(
+      JSON.stringify({
+        type: "make-call",
+        payload: {
+          roomId: this.roomId,
+          userId: this.userId,
+          remoteUserId: remoteUserId,
+          callId: callID, 
+        }
+      })
+    );
+  }
+
   async createLocalTrack() {
     this.localTracks.audioTrack = await AgoraRTC.createMicrophoneAudioTrack();
     this.localTracks.videoTrack = await AgoraRTC.createCameraVideoTrack();
@@ -322,6 +387,7 @@ class GameScene extends Phaser.Scene {
     users.forEach((u) => {
       const p = this.physics.add.sprite(u.x, u.y, "run");
       p.play("idle", true);
+      p.userId = u.userId;
       this.players[u.userId] = p;
     });
     this.player.x = spawn.x;
@@ -330,6 +396,7 @@ class GameScene extends Phaser.Scene {
 
   userJoin(payload) {
     const p = this.physics.add.sprite(payload.x, payload.y, "run");
+    p.userId = payload.userId;
     this.players[payload.userId] = p;
   }
 
@@ -345,6 +412,21 @@ class GameScene extends Phaser.Scene {
 
   movementRejected(payload) {
     this.player.setPosition(payload.x, payload.y);
+  }
+
+  onCallRequest(payload) {
+    this.agoraChannel = payload.channel;
+    this.joinChannel()
+    this.ws.send(
+      JSON.stringify({
+        type: "call-accept",
+        payload: {
+          userId: this.userId,
+          channelId: this.agoraChannel,
+        }
+      })
+    )
+    console.log("Channel Joinned")
   }
 }
 

@@ -61,5 +61,9 @@ func eventHandler(conn *websocket.Conn, message []byte) {
 		join(conn, msg.Payload)
 	case "move":
 		move(conn, msg.Payload)
+	case "make-call":
+		makeCall(conn, msg.Payload)
+	case "call-accept":
+		callAccepted(conn, msg.Payload)
 	}
 }
