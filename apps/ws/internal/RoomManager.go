@@ -82,7 +82,7 @@ func (rm *RoomManager) GetUsersInRoom(roomID string, currentUserId string) []Use
 }
 
 // Deleting a room need optimization.
-func (rm *RoomManager) RemoveUserFromRoom(conn *websocket.Conn) {
+func (rm *RoomManager) RemoveUserFromRoom(conn *websocket.Conn) string {
 	rm.mu.Lock()
 	defer rm.mu.Unlock()
 
@@ -105,13 +105,14 @@ func (rm *RoomManager) RemoveUserFromRoom(conn *websocket.Conn) {
 				jsonMessage, err := json.Marshal(message)
 				if err != nil {
 					log.Println(err)
-					return
+					return ""
 				}
 				rm.BroadcastToRoom(roomId, user.Id, jsonMessage)
-				return
+				return user.Id
 			}
 		}
 	}
+	return ""
 }
 
 // No Error Handling here.

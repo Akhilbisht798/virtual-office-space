@@ -175,8 +175,8 @@ class GameScene extends Phaser.Scene {
   update() {
     const speed = 160;
 
+    let isNear = false;
     Object.values(this.players).forEach(player => {
-      if (player === this.player) return;
       const distance = Math.sqrt(
         Math.pow(this.player.x - player.x, 2) +
         Math.pow(this.player.y - player.y, 2)
@@ -184,7 +184,9 @@ class GameScene extends Phaser.Scene {
       if (distance <= 40) {
         console.log("Near each other")
         this.showVideoCallBtn(player.userId)
-      } else {
+        isNear = true;
+      } 
+      if (!isNear) {
         const btn = document.getElementById("video-call-btn")
         if (btn) {
           btn.remove()
@@ -245,6 +247,8 @@ class GameScene extends Phaser.Scene {
       if (mediaType === 'audio') {
         user.audioTrack.play()
       }
+      const remoteUsers = this.agoraClient.remoteUsers
+      console.log("Remote users: ", remoteUsers.length)
     })
 
     this.agoraClient.on("user-unpublished", async (user) => {
@@ -252,8 +256,16 @@ class GameScene extends Phaser.Scene {
       video && video.remove()
       delete this.remoteVideo[user.uid]
       console.log("remote user removed: ", user.uid)
+
     })
-    //await this.joinChannel()
+
+    this.agoraClient.on("user-left", async (user) => {
+      const remoteUsers = this.agoraClient.remoteUsers
+      if (remoteUsers.length === 0) {
+        this.leaveChannel()
+      }
+      console.log("Remote users left after: ", remoteUsers.length)
+    })
   }
 
   async displayLocalVideo() {
@@ -427,6 +439,29 @@ class GameScene extends Phaser.Scene {
       })
     )
     console.log("Channel Joinned")
+  }
+
+  leaveChannel() {
+    this.agoraClient.leave(() => {
+      console.log("Client leaves channel");
+    }, (err) => {
+      console.log("Client leave failed", err);
+    });
+    this.localTracks.videoTrack.close();
+    this.localTracks.audioTrack.close();
+    const videoContainer = document.getElementById("video-container");
+    videoContainer && videoContainer.remove();
+
+    this.ws.send(
+      JSON.stringify({
+        type: "leave-call",
+        payload: {
+          userId: this.userId,
+          channelId: this.agoraChannel,
+        }
+      })
+    )
+    this.agoraChannel = null;
   }
 }
 

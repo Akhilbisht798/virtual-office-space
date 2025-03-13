@@ -129,6 +129,8 @@ func makeCall(conn *websocket.Conn, payload map[string]interface{}) {
 	remoteUserId := payload["remoteUserId"].(string)
 	callId := payload["callId"].(string)
 
+	log.Println("Making a call with CallID", callId)
+
 	if CallManager == nil {
 		CallManager = NewCallManager()
 	}
@@ -146,4 +148,15 @@ func callAccepted(conn *websocket.Conn, payload map[string]interface{}) {
 	}
 
 	CallManager.CallAccepted(channelID, userId)
+}
+
+func leaveCall(conn *websocket.Conn, payload map[string]interface{}) {
+	channelId := payload["channelId"].(string)
+	userId := payload["userId"].(string)
+
+	if CallManager == nil {
+		return
+	}
+
+	CallManager.LeaveCall(channelId, userId)
 }
