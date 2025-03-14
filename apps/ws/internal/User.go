@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -56,6 +55,6 @@ func GetUser(userId string) (string, error) {
 		log.Println(err.Error())
 		return "", err
 	}
-	fmt.Println("Sprite is: ", data.Sprite)
+	//fmt.Println("Sprite is: ", data.Sprite)
 	return data.Sprite, nil
 }

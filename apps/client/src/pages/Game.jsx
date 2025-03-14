@@ -10,7 +10,7 @@ const sizes = {
   height: 300,
 };
 
-const Game = () => {
+const Game = ({ spaceId }) => {
   async function downloadZip(url) {
     const response = await fetch(url);
     if (!response.ok) {
@@ -68,7 +68,7 @@ const Game = () => {
     const url = SERVER + "/api/v1/joinroom";
 
     const data = {
-      roomID: "76417741-22c4-42d8-8d0f-3ad0a3f7c27b",
+      roomID: spaceId,
     };
 
     try {
@@ -106,7 +106,7 @@ const Game = () => {
         scene: [GameScene],
       };
       game = new Phaser.Game(config);
-      game.scene.start("GameScene", { files });
+      game.scene.start("GameScene", { files, spaceId });
     }
 
     start();

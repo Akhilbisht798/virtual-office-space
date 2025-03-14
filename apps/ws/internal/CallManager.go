@@ -92,6 +92,9 @@ func (c *Calls) LeaveCall(channelId, userId string) {
 }
 
 func (c *Calls) RemoveUserFromCall(userId string) {
+	if c == nil {
+		return
+	}
 	for roomId, users := range c.rooms {
 		for i, user := range users {
 			if user == userId {
