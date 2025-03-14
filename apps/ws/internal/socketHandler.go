@@ -31,7 +31,10 @@ func WebSocketHandler(w http.ResponseWriter, r *http.Request) {
 
 func handleConnection(conn *websocket.Conn) {
 	defer func() {
-		Rooms.RemoveUserFromRoom(conn)
+		userId := Rooms.RemoveUserFromRoom(conn)
+		if userId != "" {
+			CallManager.RemoveUserFromCall(userId)
+		}
 		conn.Close()
 	}()
 
@@ -61,5 +64,11 @@ func eventHandler(conn *websocket.Conn, message []byte) {
 		join(conn, msg.Payload)
 	case "move":
 		move(conn, msg.Payload)
+	case "make-call":
+		makeCall(conn, msg.Payload)
+	case "call-accept":
+		callAccepted(conn, msg.Payload)
+	case "leave-call":
+		leaveCall(conn, msg.Payload)
 	}
 }

@@ -18,3 +18,6 @@ docker run -d --name minio \
 - should have entry for the map and the room and should have it on s3 in zip form (later automate it).
 - Maps stored :- maps/map1.zip maps/map2.zip etc.
 - Make a database entry for that map.
+
+- When creating a user also create a sprite entry for it (haven't put it on use in client though). 
+- create a sprite add it to s3 with entry on db.
