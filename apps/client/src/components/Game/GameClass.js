@@ -23,7 +23,7 @@ class GameScene extends Phaser.Scene {
       audioTrack: null,
     };
     this.agoraClient = null;
-    this.agoraAppID = "cc0e18c2f01c4227a22b79678726b652";
+    this.agoraAppID = import.meta.env.VITE_AGORA_APP_ID;
     this.agoraToken = null;
     this.agoraChannel = null;
   }
