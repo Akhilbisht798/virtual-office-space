@@ -1,7 +1,7 @@
 import Phaser from "phaser";
 import { getSocketInstance } from "../../hooks/useSocket";
 import AgoraRTC from "agora-rtc-sdk-ng";
-import {v4 as uuidv4, v4} from "uuid";
+import {v4 as uuidv4 } from "uuid";
 
 class GameScene extends Phaser.Scene {
   static SCENE_KEY = "GameScene";
@@ -16,6 +16,7 @@ class GameScene extends Phaser.Scene {
     this.roomId = "90";
     this.userId;
     this.remoteVideo = {};
+    this.onCall = false;
 
     this.localTracks = {
       videoTrack: null,
@@ -24,7 +25,7 @@ class GameScene extends Phaser.Scene {
     this.agoraClient = null;
     this.agoraAppID = "cc0e18c2f01c4227a22b79678726b652";
     this.agoraToken = null;
-    this.agoraChannel;
+    this.agoraChannel = null;
   }
 
   init(data) {
@@ -174,25 +175,34 @@ class GameScene extends Phaser.Scene {
 
   update() {
     const speed = 160;
-
     let isNear = false;
+
+    if (this.onCall) {
+      this.showLeaveButton()
+      console.log("LEAVE BUTTON ADDED")
+    } else {
+      const btn = document.getElementById("video-stop-btn")
+      if (btn) {
+        btn.remove()
+      }
+    }
+
     Object.values(this.players).forEach(player => {
-      const distance = Math.sqrt(
-        Math.pow(this.player.x - player.x, 2) +
-        Math.pow(this.player.y - player.y, 2)
-      );
+      const distance = Phaser.Math.Distance.Between(this.player.x, this.player.y, player.x, player.y);
       if (distance <= 40) {
-        console.log("Near each other")
-        this.showVideoCallBtn(player.userId)
+        if (!this.onCall) {
+          this.showVideoCallBtn(player.userId)
+        }
         isNear = true;
       } 
-      if (!isNear) {
-        const btn = document.getElementById("video-call-btn")
-        if (btn) {
-          btn.remove()
-        }
-      }
     })
+
+    if (!isNear) {
+      const btn = document.getElementById("video-call-btn")
+      if (btn) {
+        btn.remove()
+      }
+    }
 
     if (this.prevX !== this.player.x || this.prevY !== this.player.y) {
       this.prevX = this.player.x;
@@ -238,25 +248,26 @@ class GameScene extends Phaser.Scene {
   async initAgora() {
     this.agoraClient = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
     this.agoraClient.on("user-published", async (user, mediaType) => {
-      await this.agoraClient.subscribe(user, mediaType)
-      if (mediaType === "video") {
-        console.log("remote users joined: ", user.uid)
-        await this.displayRemoteVideo(user)
-      }
+      try {
+        await this.agoraClient.subscribe(user, mediaType)
+        if (mediaType === "video") {
+          console.log("remote users joined: ", user.uid)
+          await this.displayRemoteVideo(user)
+        }
 
-      if (mediaType === 'audio') {
-        user.audioTrack.play()
+        if (mediaType === 'audio') {
+          user.audioTrack.play()
+        }
+        const remoteUsers = this.agoraClient.remoteUsers
+      } catch (error) {
+        console.error("Error subscribing to remote user: ", error)
       }
-      const remoteUsers = this.agoraClient.remoteUsers
-      console.log("Remote users: ", remoteUsers.length)
     })
 
     this.agoraClient.on("user-unpublished", async (user) => {
       const video = document.getElementById(user.uid)
       video && video.remove()
       delete this.remoteVideo[user.uid]
-      console.log("remote user removed: ", user.uid)
-
     })
 
     this.agoraClient.on("user-left", async (user) => {
@@ -264,7 +275,6 @@ class GameScene extends Phaser.Scene {
       if (remoteUsers.length === 0) {
         this.leaveChannel()
       }
-      console.log("Remote users left after: ", remoteUsers.length)
     })
   }
 
@@ -357,6 +367,33 @@ class GameScene extends Phaser.Scene {
     document.body.appendChild(btn)
   }
 
+  async showLeaveButton() {
+    const checkBtn = document.getElementById("video-stop-btn");
+    if (checkBtn) {
+      return;
+    }
+    const btn = document.createElement("button");
+    btn.id = "video-stop-btn"
+    btn.innerText = "Leave"
+    btn.style.position = "fixed"
+    btn.style.bottom = "20px"
+    btn.style.left = "50%"
+    btn.style.fontSize = "16px";
+    btn.style.padding = "10px 20px";
+    btn.style.cursor = "pointer";
+
+    btn.style.backgroundColor = "#007bff"; 
+    btn.style.color = "#fff";
+    btn.style.border = "none";
+    btn.style.borderRadius = "5px";
+
+    btn.addEventListener("click", () => {
+      this.leaveChannel();
+    });
+
+    document.body.appendChild(btn)
+  }
+
   async makeCall(remoteUserId) {
     console.log("Make a call")
     const callID = uuidv4()
@@ -381,10 +418,15 @@ class GameScene extends Phaser.Scene {
   }
 
   async joinChannel() {
-    await this.agoraClient.join(this.agoraAppID, this.agoraChannel, null, 0);
-    await this.createLocalTrack();
-    await this.displayLocalVideo();
-    await this.agoraClient.publish([this.localTracks.videoTrack, this.localTracks.audioTrack]);
+    try {
+      await this.agoraClient.join(this.agoraAppID, this.agoraChannel, null, 0);
+      await this.createLocalTrack();
+      await this.displayLocalVideo();
+      await this.agoraClient.publish([this.localTracks.videoTrack, this.localTracks.audioTrack]);
+      this.onCall = true;
+    } catch (error) {
+      console.error("Error joining the channel: ", error)
+    }
   }
 
   spaceJoined(payload) {
@@ -447,8 +489,8 @@ class GameScene extends Phaser.Scene {
     }, (err) => {
       console.log("Client leave failed", err);
     });
-    this.localTracks.videoTrack.close();
-    this.localTracks.audioTrack.close();
+    if (this.localTracks.videoTrack) this.localTracks.videoTrack.close();
+    if (this.localTracks.audioTrack) this.localTracks.audioTrack.close();
     const videoContainer = document.getElementById("video-container");
     videoContainer && videoContainer.remove();
 
@@ -462,6 +504,9 @@ class GameScene extends Phaser.Scene {
       })
     )
     this.agoraChannel = null;
+    const btn = document.getElementById("video-call-btn")
+    if (btn) btn.remove()
+    this.onCall = false;
   }
 }
 
