@@ -115,6 +115,7 @@ const Game = ({ spaceId }) => {
       console.log("destroying game");
       game.input.keyboard.destroy();
       game.destroy(true, true);
+      //TODO: check if all the assets will be deleted.
     };
   }, []);
   return <canvas id="GameCanvas" />;
