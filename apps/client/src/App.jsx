@@ -15,7 +15,9 @@ function App() {
   return (
     <>
       <h1>This is home page</h1>
-      {/*<Game spaceId="76417741-22c4-42d8-8d0f-3ad0a3f7c27b"/>*/}
+      {/*
+      <Game spaceId="76417741-22c4-42d8-8d0f-3ad0a3f7c27b"/>
+      */}
     </>
   )
 }

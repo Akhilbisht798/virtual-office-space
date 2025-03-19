@@ -50,11 +50,11 @@ class GameScene extends Phaser.Scene {
       const assetFileURl = this.mapName + tileset.image;
       this.load.image(tileset.name, this.files[assetFileURl])
     });
-    this.load.spritesheet("run", "assets/spirite/Run.png", {
+    this.load.spritesheet("run", "/assets/spirite/Run.png", {
       frameWidth: 42,
       frameHeight: 42,
     });
-    this.load.spritesheet("idle", "assets/spirite/Idle.png", {
+    this.load.spritesheet("idle", "/assets/spirite/Idle.png", {
       frameWidth: 42,
       frameHeight: 42,
     });
