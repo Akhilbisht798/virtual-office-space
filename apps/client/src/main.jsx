@@ -13,6 +13,7 @@ createRoot(document.getElementById('root')).render(
       <Route path='login' element={<Login />} />
       <Route path='signup' element={<SignUp />} />
       <Route path='space/:spaceId' element={<Room />} />
+      <Route path="*" element={<h1>Not Found</h1>} />
     </Routes>
   </BrowserRouter> 
 );
