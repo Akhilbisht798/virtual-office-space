@@ -1,13 +1,14 @@
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useNavigate } from "react-router"
 import { IoEnterOutline } from "react-icons/io5";
 import TopBar from "./components/Home/TopBar"
 
 function App() {
   let navigate = useNavigate()
+  const [room, setRoom] = useState("")
 
   const handleEnterRoomCode = () => {
-    console.log("join room")
+    navigate("/space/" + room)
     return
   }
 
@@ -39,6 +40,7 @@ function App() {
             type="text" 
             placeholder="Enter code"
             className="p-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-300" 
+            onChange={(e) => setRoom(e.target.value)}
           />
           <button 
             className="flex items-center gap-2 bg-blue-500 text-white p-2 rounded"

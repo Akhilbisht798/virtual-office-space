@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { SERVER } from "../global";
 import axios from "axios";
 import JSZip from "jszip";
+import { getSocketInstance } from "../hooks/useSocket";
 
 const sizes = {
   width: 400,
@@ -113,6 +114,10 @@ const Game = ({ spaceId }) => {
 
     return () => {
       console.log("destroying game");
+      const ws = getSocketInstance()
+      if (ws) {
+        ws.close();
+      }
       game.input.keyboard.destroy();
       game.destroy(true, true);
       //TODO: check if all the assets will be deleted.
