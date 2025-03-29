@@ -21,3 +21,10 @@ docker run -d --name minio \
 
 - When creating a user also create a sprite entry for it (haven't put it on use in client though). 
 - create a sprite add it to s3 with entry on db.
+
+
+
+### TODO
+- [ ] check remove assests if i delete the game.
+- [ ] design the frontend for getting and creating the room. 
+- [ ] maps 

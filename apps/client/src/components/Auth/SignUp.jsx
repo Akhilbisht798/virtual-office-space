@@ -1,40 +1,35 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import { NavLink } from "react-router";
 import axios from "axios";
 import { SERVER } from "../../global";
-import { NavLink, useNavigate } from "react-router";
 
-const Login = () => {
-  const navigate = useNavigate()
+const SignUp = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault(); 
-    const signInUrl = `${SERVER}/api/v1/signin`; 
+    const signUpUrl = `${SERVER}/api/v1/signup`;
 
     try {
-      const signInData = {
+      const signUpData = {
         username,
         password,
       };
-      const res = await axios.post(signInUrl, signInData);
-
-      localStorage.setItem("jwt", res.data.token);
-      console.log("Token stored in localStorage:", localStorage.getItem("jwt"));
+      const res = await axios.post(signUpUrl, signUpData);
+      console.log("request succesfull.", res)
 
       setError("");
-      navigate("/")
     } catch (err) {
-      console.error("Login failed:", err);
-      setError("Invalid username or password");
+      console.error("SignUp failed:", err);
+      setError(err.message);
     }
   };
-
   return (
     <div className="flex justify-center items-center h-screen bg-gray-100">
       <div className="bg-white p-6 rounded shadow-md w-full max-w-sm">
-        <h1 className="text-xl font-semibold mb-4">Login</h1>
+        <h1 className="text-xl font-semibold mb-4">SignUp</h1>
         {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
@@ -73,13 +68,13 @@ const Login = () => {
             type="submit"
             className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
           >
-            Login
+            SignUp
           </button>
         </form>
-        <NavLink to="/signup" end>Create a New Account.</NavLink>
+        <NavLink to="/login" end>Already have a account. Login</NavLink>
       </div>
     </div>
   );
-};
+}
 
-export default Login;
+export default SignUp;

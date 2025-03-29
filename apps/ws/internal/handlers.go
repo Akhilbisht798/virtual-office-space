@@ -12,9 +12,14 @@ import (
 var Rooms *RoomManager
 var CallManager *Calls
 
+// TODO: make handle payload properly.
+// maybe later.
 func join(conn *websocket.Conn, payload map[string]interface{}) {
-	log.Println("Secret is: ", os.Getenv("SECRET"))
-	cookie := payload["jwt"].(string)
+	cookie, ok := payload["jwt"].(string)
+	if !ok {
+		log.Println("cookie payload not available")
+		return
+	}
 
 	token, err := jwt.ParseWithClaims(cookie, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte(os.Getenv("SECRET")), nil
@@ -33,7 +38,6 @@ func join(conn *websocket.Conn, payload map[string]interface{}) {
 		log.Println("Error Getting User: ", err.Error())
 		return
 	}
-	log.Println("user sprite: ", sprite)
 
 	user := &UserConn{
 		conn:   conn,
@@ -43,8 +47,9 @@ func join(conn *websocket.Conn, payload map[string]interface{}) {
 		Sprite: sprite,
 	}
 
-	log.Printf("user to be added: %+v\n", user)
+	//log.Printf("user to be added: %+v\n", user)
 	room := payload["roomId"].(string)
+	log.Println("room: ", room)
 
 	if Rooms == nil {
 		Rooms = NewRoomManager()

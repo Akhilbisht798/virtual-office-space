@@ -4,13 +4,14 @@ import { useEffect } from "react";
 import { SERVER } from "../global";
 import axios from "axios";
 import JSZip from "jszip";
+import { getSocketInstance } from "../hooks/useSocket";
 
 const sizes = {
   width: 400,
   height: 300,
 };
 
-const Game = () => {
+const Game = ({ spaceId }) => {
   async function downloadZip(url) {
     const response = await fetch(url);
     if (!response.ok) {
@@ -68,7 +69,7 @@ const Game = () => {
     const url = SERVER + "/api/v1/joinroom";
 
     const data = {
-      roomID: "76417741-22c4-42d8-8d0f-3ad0a3f7c27b",
+      roomID: spaceId,
     };
 
     try {
@@ -106,15 +107,20 @@ const Game = () => {
         scene: [GameScene],
       };
       game = new Phaser.Game(config);
-      game.scene.start("GameScene", { files });
+      game.scene.start("GameScene", { files, spaceId });
     }
 
     start();
 
     return () => {
       console.log("destroying game");
+      const ws = getSocketInstance()
+      if (ws) {
+        ws.close();
+      }
       game.input.keyboard.destroy();
       game.destroy(true, true);
+      //TODO: check if all the assets will be deleted.
     };
   }, []);
   return <canvas id="GameCanvas" />;

@@ -49,7 +49,6 @@ func (rm *RoomManager) AddUserToRoom(roomID string, user *UserConn) {
 		rm.rooms[roomID] = &createdRoom
 	}
 	rm.rooms[roomID].users[user.Id] = user
-	log.Printf(user.Id, roomID)
 }
 
 type UserPosition struct {
@@ -88,9 +87,7 @@ func (rm *RoomManager) RemoveUserFromRoom(conn *websocket.Conn) string {
 
 	for roomId, room := range rm.rooms {
 		for userId, user := range room.users {
-			log.Println(user.Id)
 			if user.conn == conn {
-				log.Println("userId to be removed: ", user.Id)
 				message := Message{
 					Type: "user-left",
 					Payload: map[string]interface{}{

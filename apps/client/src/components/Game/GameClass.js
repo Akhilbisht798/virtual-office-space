@@ -13,7 +13,7 @@ class GameScene extends Phaser.Scene {
     this.ws;
     this.prevX = 80;
     this.prevY = 30;
-    this.roomId = "90";
+    this.roomId;
     this.userId;
     this.remoteVideo = {};
     this.onCall = false;
@@ -30,6 +30,7 @@ class GameScene extends Phaser.Scene {
 
   init(data) {
     this.files = data.files;
+    this.roomId = data.spaceId
     this.mapName;
     for (let key in this.files) {
       const keyArr = key.split("/")
@@ -49,11 +50,11 @@ class GameScene extends Phaser.Scene {
       const assetFileURl = this.mapName + tileset.image;
       this.load.image(tileset.name, this.files[assetFileURl])
     });
-    this.load.spritesheet("run", "assets/spirite/Run.png", {
+    this.load.spritesheet("run", "/assets/spirite/Run.png", {
       frameWidth: 42,
       frameHeight: 42,
     });
-    this.load.spritesheet("idle", "assets/spirite/Idle.png", {
+    this.load.spritesheet("idle", "/assets/spirite/Idle.png", {
       frameWidth: 42,
       frameHeight: 42,
     });
@@ -128,6 +129,7 @@ class GameScene extends Phaser.Scene {
 
       const token = localStorage.getItem("jwt")
 
+      console.log("joining to roomId", this.roomId)
       this.ws.send(
         JSON.stringify({
           type: "join",
@@ -397,7 +399,7 @@ class GameScene extends Phaser.Scene {
   async makeCall(remoteUserId) {
     console.log("Make a call")
     const callID = uuidv4()
-    
+
     this.ws.send(
       JSON.stringify({
         type: "make-call",
