@@ -2,10 +2,13 @@ import { useEffect, useState } from "react"
 import { useNavigate } from "react-router"
 import { IoEnterOutline } from "react-icons/io5";
 import TopBar from "./components/Home/TopBar"
+import axios from "axios";
+import { SERVER } from "./global";
 
 function App() {
   let navigate = useNavigate()
   const [room, setRoom] = useState("")
+  const [space, setSpace] = useState([])
 
   const handleEnterRoomCode = () => {
     navigate("/space/" + room)
@@ -13,11 +16,24 @@ function App() {
   }
 
   useEffect(() => {
-    const jwt = localStorage.getItem("jwt")
-    if (!jwt) {
-      console.log("jwt not found")
-      navigate("/login", { replace: true })
+    const getSpaces = async () => {
+      try {
+        const jwt = localStorage.getItem("jwt")
+        if (!jwt) {
+          console.log("jwt not found")
+          navigate("/login", { replace: true })
+        }
+        console.log("jwt is: ", jwt)
+        const res = await axios.post(`${SERVER}/api/v1/getSpaces`, {
+          jwt
+        })
+        console.log(res.data.spaces)
+        setSpace(res.data.spaces)
+      } catch (err) {
+        console.log("error in getting spaces: ", err)
+      }
     }
+    getSpaces()
   }, [navigate])
 
   return (
@@ -48,10 +64,14 @@ function App() {
               <IoEnterOutline/> Join with code
           </button>
           <button 
+            onClick={() => navigate("/spaces")}
             className="bg-blue-500 text-white p-2 rounded">
               Create room
           </button>
         </div>
+      </div>
+      <div className="gap-4 p-4">
+        recent created spaces
       </div>
     </div>
   )

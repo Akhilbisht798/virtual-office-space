@@ -1,7 +1,7 @@
 import Game from "./Game";
 import { useParams } from "react-router";
 
-const Room = () => {
+const GameComponent = () => {
   let param = useParams()
   const spaceId = param.spaceId
 
@@ -15,4 +15,4 @@ const Room = () => {
   )
 }
 
-export default Room;
+export default GameComponent;

@@ -9,6 +9,7 @@ import (
 
 	"github.com/Akhilbisht798/office/server/internals/cloud"
 	"github.com/Akhilbisht798/office/server/internals/db"
+	"github.com/dgrijalva/jwt-go/v4"
 	"github.com/go-playground/validator"
 	"github.com/google/uuid"
 )
@@ -18,7 +19,7 @@ type CreateRoomRequest struct {
 	MapId     string `json:"mapId" validate:"required"`
 	Thumbnail string `json:"thumbnail"`
 	Public    bool   `json:"public"`
-	UserID    string `json:"userID" validate:"required"`
+	Jwt       string `json:"jwt" validate:"required"`
 }
 
 func CreateRoom(w http.ResponseWriter, r *http.Request) {
@@ -42,13 +43,25 @@ func CreateRoom(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Println("Type of Public: ", reflect.TypeOf(data.Public))
 
+	token, err := jwt.ParseWithClaims(data.Jwt, &jwt.StandardClaims{}, func(t *jwt.Token) (interface{}, error) {
+		return []byte(os.Getenv("SECRET")), nil
+	})
+
+	if err != nil {
+		log.Println("Error with cookie: ", err.Error())
+		return
+	}
+
+	claims := token.Claims.(*jwt.StandardClaims)
+	id := claims.Issuer
+
 	room := db.Space{
 		ID:        uuid.New().String(),
 		Name:      data.Name,
 		MapID:     data.MapId,
 		Public:    data.Public,
 		Thumbnail: &data.Thumbnail,
-		UserID:    data.UserID,
+		UserID:    id,
 	}
 	log.Printf("Room to be saved: %+v\n", room)
 
