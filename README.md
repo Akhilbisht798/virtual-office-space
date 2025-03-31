@@ -13,7 +13,6 @@ docker run -d --name minio \
   quay.io/minio/minio server /data --console-address ":9001"
 
 
-
 - Start both minio server or s3 and a database put the map in minio so it can import that.
 - should have entry for the map and the room and should have it on s3 in zip form (later automate it).
 - Maps stored :- maps/map1.zip maps/map2.zip etc.
@@ -22,9 +21,12 @@ docker run -d --name minio \
 - When creating a user also create a sprite entry for it (haven't put it on use in client though). 
 - create a sprite add it to s3 with entry on db.
 
-
+### Maps
+- Create a map using tiled. 
+- make sure to embed you tileset on your map.
+- export it as a json and make sure path are right. 
+- make a zip and upload it to s3 and put database entry for it. 
 
 ### TODO
-- [ ] check remove assests if i delete the game.
-- [ ] design the frontend for getting and creating the room. 
-- [ ] maps 
+- [ ] maps and good spirites. 
+- [ ] hosting it. 

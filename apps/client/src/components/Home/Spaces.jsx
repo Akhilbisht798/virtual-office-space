@@ -49,10 +49,10 @@ const Spaces = () => {
     return (
         <div className='p-4 bg-white min-h-screen flex flex-col gap-4'>
             <h3 className='text-2xl font-bold p-4'>Create a new space</h3>
-            <div className='flex gap-4'>
+            <div className='flex gap-4 align-center'>
                 <label htmlFor='spaceName' className='text-lg'>Space Name</label>
                 <input
-                    className='border-2 border-gray-300 rounded'
+                    className='border-2 border-gray-300 rounded p-1'
                     type='text'
                     placeholder='Enter New Space Name'
                     onChange={(e) => setSpacesId(e.target.value)}
