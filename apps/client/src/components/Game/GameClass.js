@@ -50,20 +50,22 @@ class GameScene extends Phaser.Scene {
       const assetFileURl = this.mapName + tileset.image;
       this.load.image(tileset.name, this.files[assetFileURl])
     });
-    this.load.spritesheet("run", "/assets/spirite/Run.png", {
-      frameWidth: 42,
-      frameHeight: 42,
-    });
-    this.load.spritesheet("idle", "/assets/spirite/Idle.png", {
-      frameWidth: 42,
-      frameHeight: 42,
-    });
     this.load.spritesheet("ch1", "/spirite/charecter1.png", {
       frameWidth: 142/3,
       frameHeight: 424/4,
     })
-    // load all the charecter like ch1 , ch2, ch3
-    // after this plan to import them dynamically
+    this.load.spritesheet("ch2", "/spirite/charecter2.png", {
+      frameWidth: 148/3,
+      frameHeight: 371/4,
+    })
+    this.load.spritesheet("ch3", "/spirite/charecter3.png", {
+      frameWidth: 143/3,
+      frameHeight: 380/4,
+    })
+    this.load.spritesheet("ch4", "/spirite/charecter4.png", {
+      frameWidth: 144/3,
+      frameHeight: 360/4,
+    })
   }
 
   create() {
@@ -93,7 +95,9 @@ class GameScene extends Phaser.Scene {
       }
     });
 
-    this.player = this.createSpirite()
+    const randomId = Math.floor(Math.random() * 4) + 1;
+    const charecterId = "ch" + randomId
+    this.player = this.createSpirite(charecterId)
 
     // Collision
     if (collisionLayer) {
@@ -422,7 +426,9 @@ class GameScene extends Phaser.Scene {
     console.log("users: ", users)
 
     users.forEach((u) => {
-      const p = this.createSpirite();
+      const randomId = Math.floor(Math.random() * 4) + 1;
+      const charecterId = "ch" + randomId
+      const p = this.createSpirite(charecterId);
       p.play("chIdle", true)
       p.userId = u.userId;
       this.players[u.userId] = p;
@@ -432,7 +438,9 @@ class GameScene extends Phaser.Scene {
   }
 
   userJoin(payload) {
-    const p = this.createSpirite()
+    const randomId = Math.floor(Math.random() * 4) + 1;
+    const charecterId = "ch" + randomId
+    const p = this.createSpirite(charecterId)
     p.play("chIdle", true)
     p.userId = payload.userId;
     this.players[payload.userId] = p;
@@ -518,10 +526,10 @@ class GameScene extends Phaser.Scene {
     this.onCall = false;
   }
 
-  createSpirite() {
+  createSpirite(charecterId) {
     const chDown = {
       key: "chDown", 
-      frames: this.anims.generateFrameNumbers("ch1", {
+      frames: this.anims.generateFrameNumbers(charecterId, {
         frames: [0, 1, 2],
       }),
       frameRate: 8,
@@ -529,7 +537,7 @@ class GameScene extends Phaser.Scene {
     }
     const chLeft = {
       key: "chLeft", 
-      frames: this.anims.generateFrameNumbers("ch1", {
+      frames: this.anims.generateFrameNumbers(charecterId, {
         frames: [3, 4, 5],
       }),
       frameRate: 8,
@@ -537,7 +545,7 @@ class GameScene extends Phaser.Scene {
     }
     const chRight = {
       key: "chRight", 
-      frames: this.anims.generateFrameNumbers("ch1", {
+      frames: this.anims.generateFrameNumbers(charecterId, {
         frames: [6, 7, 8],
       }),
       frameRate: 8,
@@ -545,7 +553,7 @@ class GameScene extends Phaser.Scene {
     }
     const chUp = {
       key: "chUp", 
-      frames: this.anims.generateFrameNumbers("ch1", {
+      frames: this.anims.generateFrameNumbers(charecterId, {
         frames: [9, 10, 11],
       }),
       frameRate: 8,
@@ -553,7 +561,7 @@ class GameScene extends Phaser.Scene {
     }
     const idle = {
       key: "chIdle",
-      frames: this.anims.generateFrameNumbers("ch1", {
+      frames: this.anims.generateFrameNumbers(charecterId, {
         frames: [1],
       }),
       frameRate: 8,
