@@ -5,7 +5,9 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
+	"github.com/Akhilbisht798/office/server/internals/cloud"
 	"github.com/Akhilbisht798/office/server/internals/db"
 	"github.com/dgrijalva/jwt-go/v4"
 	"github.com/go-playground/validator"
@@ -24,6 +26,22 @@ func GetMaps(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	log.Printf("fetched spaces: %#v", maps)
+
+	bucket := os.Getenv("BUCKET")
+	cloud.GetPreSignedUrl(bucket, "maps/thumbnail", 60)
+
+	for i := range maps {
+		mapsName := strings.Split(maps[i].Name, ".")[0]
+		mapsName = mapsName + ".png"
+		thumbnailKey := "maps/thumbnail/" + mapsName
+		log.Println("thumbnail key: ", thumbnailKey)
+		url, err := cloud.GetPreSignedUrl(bucket, thumbnailKey, 60)
+		if err != nil {
+			continue
+		}
+		maps[i].Thumbnail = &url.URL
+	}
+
 	response := map[string]interface{}{
 		"maps": maps,
 	}
@@ -82,6 +100,15 @@ func GetSpaces(w http.ResponseWriter, r *http.Request) {
 		ReturnError(w, res.Error.Error(), http.StatusBadRequest)
 		return
 	}
+	bucket := os.Getenv("BUCKET")
+	for i := range spaces {
+		url, err := cloud.GetPreSignedUrl(bucket, *spaces[i].Thumbnail, 60)
+		if err != nil {
+			continue
+		}
+		spaces[i].Thumbnail = &url.URL
+	}
+
 	response := map[string]interface{}{
 		"spaces": spaces,
 	}
