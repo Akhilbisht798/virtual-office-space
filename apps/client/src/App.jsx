@@ -33,7 +33,6 @@ function App() {
         const res = await axios.post(`${SERVER}/api/v1/getSpaces`, {
           jwt
         })
-        console.log(res.data.spaces)
         setSpaces(res.data.spaces)
       } catch (err) {
         console.log("error in getting spaces: ", err)
@@ -49,7 +48,7 @@ function App() {
         <img src="/home/office.webp" alt="office" className="w-1/3 rounded-lg"/>
         <div className="flex flex-col items-start gap-6">
           <h1 className="text-center text-5xl font-semibold text-black">
-            Welcome to Zep
+            Welcome to Nuzo
           </h1>
           <p className="text-2xl">
             Virtually connect with people in a interactive way
@@ -77,7 +76,7 @@ function App() {
         </div>
       </div>
       <div className="gap-4 p-4">
-        recent created spaces
+        <h3 className="text-xl">recent created spaces</h3>
         <div className="flex flex-row flex-wrap gap-4 p-4 border-2 border-gray-300 rounded">
           {
             spaces.map((s) => (

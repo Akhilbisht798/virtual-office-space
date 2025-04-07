@@ -8,9 +8,14 @@ const TopBar = () => {
         localStorage.removeItem("jwt");
         navigate("/login", { replace: true });
     }
+
+    const homePageHandler = () => {
+        navigate("/", { replace: true });
+    }
+
     return (
         <div className="flex bg-blue-600 text-white shadow-md p-4 justify-between">
-            <h3 className="text-white">Zep</h3>
+            <h3 className="text-white cursor-pointer" onClick={homePageHandler}>Nuzo</h3>
             <button className="flex gap-2 items-center text-white hover:text-gray-200" onClick={handleLogout}>
                 Logout <CiLogout style={{color: 'white'}}/>
             </button>
