@@ -1,4 +1,6 @@
-## Running Database 
+## Development
+
+### Running Database 
 RUN=docker run --name my-mysql -e MYSQL_ROOT_PASSWORD=rootpassword -e MYSQL_USER=myuser -e MYSQL_PASSWORD=mypassword -e MYSQL_DATABASE=mydatabase -p 3306:3306 -d mysql:latest 
 docker exec -it my-mysql bash
 mysql -u myuser -p
@@ -26,7 +28,17 @@ docker run -d --name minio \
 - make sure to embed you tileset on your map.
 - export it as a json and make sure path are right. 
 - make a zip and upload it to s3 and put database entry for it. 
+- add thumbnail directory in map directory and add map.png in it.
+
+### Spirites
+- have a spirites in spirites/charecterId
+- can create using chatgpt.
 
 ### TODO
-- [ ] maps and good spirites. 
+- [ ] detailing
+  - [ ] maps have thumbnail icons and spaces shows it.
+  - [ ] have one more good map and improve space creation page.
+  - [ ] same charecter for same user. 
+  - [ ] good ui like for shadcn etc. 
+  - [ ] show recent spaces. 
 - [ ] hosting it. 

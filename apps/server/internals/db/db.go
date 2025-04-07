@@ -20,9 +20,10 @@ type User struct {
 
 // Maps from which spaces will be created
 type Map struct {
-	ID     string  `gorm:"type:varchar(255);primaryKey;unique;default:(uuid())"`
-	Name   string  `gorm:"type:varchar(255);not null;unique"`
-	Spaces []Space `gorm:"foreignKey:MapID"`
+	ID        string  `gorm:"type:varchar(255);primaryKey;unique;default:(uuid())"`
+	Name      string  `gorm:"type:varchar(255);not null;unique"`
+	Spaces    []Space `gorm:"foreignKey:MapID"`
+	Thumbnail *string `gorm:"default:null"` // Nullable field
 }
 
 // Space or room created by a certain user to join to.

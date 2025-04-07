@@ -25,7 +25,6 @@ const Spaces = () => {
         const res = await axios.post(`${SERVER}/api/v1/createroom`, {
             name: spacesId, 
             mapId: mapId,
-            thumbnail: "https://www.google.com",
             public: true, 
             jwt: localStorage.getItem("jwt")
         });
@@ -41,6 +40,7 @@ const Spaces = () => {
     useEffect(() => {
         const fetchMaps = async () => {
             const res = await axios.get(`${SERVER}/api/v1/getMaps`);
+            console.log("maps: ",res.data.maps)
             setMaps(res.data.maps)
         }
         fetchMaps();
@@ -65,7 +65,9 @@ const Spaces = () => {
                     {
                         maps.map((map) => (
                             <div className="flex flex-col align-center justify-center cursor-pointer" id={map.ID} onClick={selectMap} key={map.ID}>
-                                <img src="/home/office.webp" className='rounded-lg w-15' id={map.ID} />
+                                <img src={map.Thumbnail === null ?  "/home/office.webp" : map.Thumbnail} 
+                                    className='rounded-lg w-full max-w-xs h-auto object-contain' 
+                                    id={map.ID} />
                                 {map.Name !== null ? map.Name.split('.')[0] : "Map1"}
                             </div>
                         ))

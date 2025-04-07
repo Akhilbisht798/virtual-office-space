@@ -8,10 +8,16 @@ import { SERVER } from "./global";
 function App() {
   let navigate = useNavigate()
   const [room, setRoom] = useState("")
-  const [space, setSpace] = useState([])
+  const [spaces, setSpaces] = useState([])
 
   const handleEnterRoomCode = () => {
     navigate("/space/" + room)
+    return
+  }
+
+  const recentMapOnClick = (e) => {
+    const id = e.target.id
+    navigate("/space/" + id)
     return
   }
 
@@ -28,7 +34,7 @@ function App() {
           jwt
         })
         console.log(res.data.spaces)
-        setSpace(res.data.spaces)
+        setSpaces(res.data.spaces)
       } catch (err) {
         console.log("error in getting spaces: ", err)
       }
@@ -72,6 +78,16 @@ function App() {
       </div>
       <div className="gap-4 p-4">
         recent created spaces
+        <div className="flex flex-row flex-wrap gap-4 p-4 border-2 border-gray-300 rounded">
+          {
+            spaces.map((s) => (
+              <div className="flex flex-col align-center justify-center cursor-pointer" id={s.ID} onClick={recentMapOnClick} key={s.ID}>
+                <img src={s.Thumbnail} className="rounded-lg w-full max-w-xs h-auto object-contain" id={s.ID} />
+                {s.Name}
+              </div>
+            ))
+          }
+        </div>
       </div>
     </div>
   )

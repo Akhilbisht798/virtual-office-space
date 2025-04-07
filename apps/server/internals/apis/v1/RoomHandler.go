@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"reflect"
+	"strings"
 
 	"github.com/Akhilbisht798/office/server/internals/cloud"
 	"github.com/Akhilbisht798/office/server/internals/db"
@@ -15,11 +16,10 @@ import (
 )
 
 type CreateRoomRequest struct {
-	Name      string `json:"name" validate:"required"`
-	MapId     string `json:"mapId" validate:"required"`
-	Thumbnail string `json:"thumbnail"`
-	Public    bool   `json:"public"`
-	Jwt       string `json:"jwt" validate:"required"`
+	Name   string `json:"name" validate:"required"`
+	MapId  string `json:"mapId" validate:"required"`
+	Public bool   `json:"public"`
+	Jwt    string `json:"jwt" validate:"required"`
 }
 
 func CreateRoom(w http.ResponseWriter, r *http.Request) {
@@ -55,12 +55,23 @@ func CreateRoom(w http.ResponseWriter, r *http.Request) {
 	claims := token.Claims.(*jwt.StandardClaims)
 	id := claims.Issuer
 
+	var mapUsed db.Map
+	res := db.Database.First(&mapUsed, "id = ?", data.MapId)
+	if res.Error != nil {
+		log.Println("Error finding map: ", err)
+		ReturnError(w, res.Error.Error(), http.StatusBadRequest)
+		return
+	}
+
+	mapName := strings.Split(mapUsed.Name, ".")[0]
+	thumbnail := "/maps/thumbnail/" + mapName + ".png"
+
 	room := db.Space{
 		ID:        uuid.New().String(),
 		Name:      data.Name,
 		MapID:     data.MapId,
 		Public:    data.Public,
-		Thumbnail: &data.Thumbnail,
+		Thumbnail: &thumbnail,
 		UserID:    id,
 	}
 	log.Printf("Room to be saved: %+v\n", room)
@@ -193,7 +204,8 @@ func JoinRoom(w http.ResponseWriter, r *http.Request) {
 	// get all presigned url for the name
 	bucket := os.Getenv("BUCKET")
 
-	url, err := cloud.GetPreSignedUrl(bucket, maps.Name, 60)
+	mapKey := "maps/" + maps.Name
+	url, err := cloud.GetPreSignedUrl(bucket, mapKey, 60)
 	if err != nil {
 		log.Println("Error getting presigned url: ", err)
 		ReturnError(w, err.Error(), http.StatusBadRequest)
