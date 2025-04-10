@@ -15,11 +15,18 @@ var CallManager *Calls
 // TODO: make handle payload properly.
 // maybe later.
 func join(conn *websocket.Conn, payload map[string]interface{}) {
+	log.Println("join method is called.")
 	cookie, ok := payload["jwt"].(string)
 	if !ok {
 		log.Println("cookie payload not available")
 		return
 	}
+	spirite, ok := payload["spirite"].(string)
+	if !ok {
+		log.Println("spirite not available")
+		return
+	}
+	log.Println("spirites: ", spirite)
 
 	token, err := jwt.ParseWithClaims(cookie, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte(os.Getenv("SECRET")), nil
@@ -33,18 +40,18 @@ func join(conn *websocket.Conn, payload map[string]interface{}) {
 	claims := token.Claims.(*jwt.StandardClaims)
 	id := claims.Issuer
 
-	sprite, err := GetUser(id)
-	if err != nil {
-		log.Println("Error Getting User: ", err.Error())
-		return
-	}
+	//sprite, err := GetUser(id)
+	//if err != nil {
+	//	log.Println("Error Getting User: ", err.Error())
+	//	return
+	//}
 
 	user := &UserConn{
 		conn:   conn,
 		Id:     id,
 		X:      payload["x"].(float64),
 		Y:      payload["y"].(float64),
-		Sprite: sprite,
+		Sprite: spirite,
 	}
 
 	//log.Printf("user to be added: %+v\n", user)
@@ -64,9 +71,9 @@ func join(conn *websocket.Conn, payload map[string]interface{}) {
 				"x": user.X,
 				"y": user.Y,
 			},
-			"userId": user.Id,
-			"sprite": user.Sprite,
-			"users":  Rooms.GetUsersInRoom(room, user.Id),
+			"userId":  user.Id,
+			"spirite": user.Sprite,
+			"users":   Rooms.GetUsersInRoom(room, user.Id),
 		},
 	}
 	jsonMessage, err := json.Marshal(message)
@@ -80,10 +87,10 @@ func join(conn *websocket.Conn, payload map[string]interface{}) {
 	message = Message{
 		Type: "user-join",
 		Payload: map[string]interface{}{
-			"userId": user.Id,
-			"x":      user.X,
-			"y":      user.Y,
-			"sprite": user.Sprite,
+			"userId":  user.Id,
+			"x":       user.X,
+			"y":       user.Y,
+			"spirite": user.Sprite,
 		},
 	}
 	jsonMessage, err = json.Marshal(message)
