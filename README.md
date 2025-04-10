@@ -35,10 +35,10 @@ docker run -d --name minio \
 - can create using chatgpt.
 
 ### TODO
-- [ ] detailing
-  - [ ] maps have thumbnail icons and spaces shows it.
-  - [ ] have one more good map and improve space creation page.
-  - [ ] same charecter for same user. 
-  - [ ] good ui like for shadcn etc. 
-  - [ ] show recent spaces. 
+- [x] detailing
+  - [x] maps have thumbnail icons and spaces shows it.
+  - [x] have one more good map and improve space creation page.
+  - [x] same charecter for same user. 
+  - [x] good ui like for shadcn etc. 
+  - [x] show recent spaces. 
 - [ ] hosting it. 
