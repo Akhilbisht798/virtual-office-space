@@ -129,6 +129,7 @@ class GameScene extends Phaser.Scene {
             x: this.prevX,
             y: this.prevY,
             jwt: token,
+            spirite: charecterId,
           },
         }),
       );
@@ -420,15 +421,11 @@ class GameScene extends Phaser.Scene {
     const spawn = payload["spawn"];
     const users = payload["users"];
     this.userId = payload["userId"]
-    const sprite = payload["sprite"]
-    console.log("sprite ", sprite)
-    console.log(this.userId)
-    console.log("users: ", users)
+    //const sprite = payload["spirite"]
 
     users.forEach((u) => {
-      const randomId = Math.floor(Math.random() * 4) + 1;
-      const charecterId = "ch" + randomId
-      const p = this.createSpirite(charecterId);
+      const spirite = u.sprite;
+      const p = this.createSpirite(spirite);
       p.play("chIdle", true)
       p.userId = u.userId;
       this.players[u.userId] = p;
@@ -438,9 +435,8 @@ class GameScene extends Phaser.Scene {
   }
 
   userJoin(payload) {
-    const randomId = Math.floor(Math.random() * 4) + 1;
-    const charecterId = "ch" + randomId
-    const p = this.createSpirite(charecterId)
+    const spirite = payload["spirite"]
+    const p = this.createSpirite(spirite)
     p.play("chIdle", true)
     p.userId = payload.userId;
     this.players[payload.userId] = p;

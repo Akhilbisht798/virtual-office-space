@@ -70,7 +70,7 @@ func getS3Client() (s3.Client, error) {
 	}
 
 	// Devlopment using MinIO
-	log.Println("using minio for devlopment side of thing")
+	//log.Println("using minio for devlopment side of thing")
 	staticResolver := aws.EndpointResolverFunc(func(service, region string) (aws.Endpoint, error) {
 		return aws.Endpoint{
 			PartitionID:       "aws",
