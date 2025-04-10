@@ -13,6 +13,7 @@ type Message struct {
 	Payload map[string]interface{} `json:"payload"`
 }
 
+// TODO: only allow frontend connection.
 var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
 		return true
