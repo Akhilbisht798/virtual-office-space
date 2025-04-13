@@ -1,3 +1,11 @@
+## Deployment 
+
+### Fly.io
+- planetscale for db
+- tigirs for s3
+- both docker container 
+- frontend on vercel.
+
 ## Development
 
 ### Running Database 
