@@ -3,7 +3,7 @@ import { useNavigate } from "react-router"
 import { IoEnterOutline } from "react-icons/io5";
 import TopBar from "./components/Home/TopBar"
 import axios from "axios";
-import { SERVER } from "./global";
+import { SERVER, SOCKET_SERVER } from "./global";
 
 function App() {
   let navigate = useNavigate()
@@ -24,6 +24,7 @@ function App() {
   useEffect(() => {
     const getSpaces = async () => {
       try {
+        console.log("SOCKET SERVER: ", SOCKET_SERVER)
         const jwt = localStorage.getItem("jwt")
         if (!jwt) {
           console.log("jwt not found")
