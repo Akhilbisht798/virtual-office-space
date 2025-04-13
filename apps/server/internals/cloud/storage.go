@@ -55,10 +55,12 @@ func PutPreSignedUrl(
 	return url, nil
 }
 
+// TODO: s3 client need to work with production.
 func getS3Client() (s3.Client, error) {
 	var client s3.Client
 	region := os.Getenv("REGION")
 	if os.Getenv("APP_ENV") == "production" {
+		log.Println("using tigris for production side of thing")
 		cfg, err := config.LoadDefaultConfig(context.TODO(),
 			config.WithDefaultRegion(region),
 		)

@@ -69,46 +69,46 @@ func UploadSprite(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-type GetSpriteRequest struct {
-	UserID string `json:"userID"`
-}
+// type GetSpriteRequest struct {
+// 	UserID string `json:"userID"`
+// }
 
-func GetSprite(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" {
-		ReturnError(w, "use post method", http.StatusBadRequest)
-		return
-	}
-	var data GetSpriteRequest
-	err := json.NewDecoder(r.Body).Decode(&data)
-	if err != nil {
-		log.Println("Error decoding body: ", err)
-		ReturnError(w, err.Error(), http.StatusBadRequest)
-		return
-	}
+// func GetSprite(w http.ResponseWriter, r *http.Request) {
+// 	if r.Method != "POST" {
+// 		ReturnError(w, "use post method", http.StatusBadRequest)
+// 		return
+// 	}
+// 	var data GetSpriteRequest
+// 	err := json.NewDecoder(r.Body).Decode(&data)
+// 	if err != nil {
+// 		log.Println("Error decoding body: ", err)
+// 		ReturnError(w, err.Error(), http.StatusBadRequest)
+// 		return
+// 	}
 
-	var user db.User
+// 	var user db.User
 
-	res := db.Database.Where("id = ?", data.UserID).First(&user)
-	if res.Error != nil {
-		log.Println("Error find item: ", err)
-		ReturnError(w, res.Error.Error(), http.StatusBadRequest)
-		return
-	}
+// 	res := db.Database.Where("id = ?", data.UserID).First(&user)
+// 	if res.Error != nil {
+// 		log.Println("Error find item: ", err)
+// 		ReturnError(w, res.Error.Error(), http.StatusBadRequest)
+// 		return
+// 	}
 
-	var avatar db.Avatar
-	res = db.Database.Where("id = ?", user.AvatarID).First(&avatar)
-	if res.Error != nil {
-		log.Println("Error find item: ", err)
-		ReturnError(w, res.Error.Error(), http.StatusBadRequest)
-		return
-	}
+// 	var avatar db.Avatar
+// 	res = db.Database.Where("id = ?", user.AvatarID).First(&avatar)
+// 	if res.Error != nil {
+// 		log.Println("Error find item: ", err)
+// 		ReturnError(w, res.Error.Error(), http.StatusBadRequest)
+// 		return
+// 	}
 
-	bucket := os.Getenv("BUCKET")
-	url, err := cloud.GetPreSignedUrl(bucket, avatar.Name, 10)
+// 	bucket := os.Getenv("BUCKET")
+// 	url, err := cloud.GetPreSignedUrl(bucket, avatar.Name, 10)
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(map[string]string{
-		"sprite": url.URL,
-	})
-}
+// 	w.Header().Set("Content-Type", "application/json")
+// 	w.WriteHeader(http.StatusOK)
+// 	json.NewEncoder(w).Encode(map[string]string{
+// 		"sprite": url.URL,
+// 	})
+// }

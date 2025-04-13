@@ -64,7 +64,7 @@ func CreateRoom(w http.ResponseWriter, r *http.Request) {
 	}
 
 	mapName := strings.Split(mapUsed.Name, ".")[0]
-	thumbnail := "/maps/thumbnail/" + mapName + ".png"
+	thumbnail := "maps/thumbnail/" + mapName + ".png"
 
 	room := db.Space{
 		ID:        uuid.New().String(),
