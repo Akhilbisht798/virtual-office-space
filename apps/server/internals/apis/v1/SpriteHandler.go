@@ -69,6 +69,46 @@ func UploadSprite(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+type GetUserDetails struct {
+	UserID string `json:"userID"`
+}
+
+type GetUserDetailsResponse struct {
+	UserID   string `json:"userID"`
+	Username string `json:"username"`
+}
+
+func GetUserDetailsHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		ReturnError(w, "use post method", http.StatusBadRequest)
+		return
+	}
+	var data GetUserDetails
+	err := json.NewDecoder(r.Body).Decode(&data)
+	if err != nil {
+		log.Println("Error decoding body: ", err)
+		ReturnError(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	var user db.User
+
+	res := db.Database.Where("id = ?", data.UserID).First(&user)
+	if res.Error != nil {
+		log.Println("Error find item: ", err)
+		ReturnError(w, res.Error.Error(), http.StatusBadRequest)
+		return
+	}
+	resBody := GetUserDetailsResponse{
+		UserID:   user.ID,
+		Username: user.Username,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(resBody)
+}
+
 // type GetSpriteRequest struct {
 // 	UserID string `json:"userID"`
 // }

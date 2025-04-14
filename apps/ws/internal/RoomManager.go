@@ -52,10 +52,11 @@ func (rm *RoomManager) AddUserToRoom(roomID string, user *UserConn) {
 }
 
 type UserPosition struct {
-	UserId string  `json:"userId"`
-	X      float64 `json:"x"`
-	Y      float64 `json:"y"`
-	Sprite string  `json:"sprite"`
+	UserId   string  `json:"userId"`
+	X        float64 `json:"x"`
+	Y        float64 `json:"y"`
+	Sprite   string  `json:"sprite"`
+	Username string  `json:"username"`
 }
 
 // Return [{ userId, x, y }, { userId, x, y }]
@@ -70,10 +71,11 @@ func (rm *RoomManager) GetUsersInRoom(roomID string, currentUserId string) []Use
 	for _, user := range room.users {
 		if user.Id != currentUserId {
 			users = append(users, UserPosition{
-				UserId: user.Id,
-				X:      float64(user.X),
-				Y:      float64(user.Y),
-				Sprite: user.Sprite,
+				UserId:   user.Id,
+				X:        float64(user.X),
+				Y:        float64(user.Y),
+				Sprite:   user.Sprite,
+				Username: user.Username,
 			})
 		}
 	}

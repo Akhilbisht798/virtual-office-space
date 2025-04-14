@@ -40,18 +40,19 @@ func join(conn *websocket.Conn, payload map[string]interface{}) {
 	claims := token.Claims.(*jwt.StandardClaims)
 	id := claims.Issuer
 
-	//sprite, err := GetUser(id)
-	//if err != nil {
-	//	log.Println("Error Getting User: ", err.Error())
-	//	return
-	//}
+	username, err := GetUser(id)
+	if err != nil {
+		log.Println("Error Getting User: ", err.Error())
+		return
+	}
 
 	user := &UserConn{
-		conn:   conn,
-		Id:     id,
-		X:      payload["x"].(float64),
-		Y:      payload["y"].(float64),
-		Sprite: spirite,
+		conn:     conn,
+		Id:       id,
+		X:        payload["x"].(float64),
+		Y:        payload["y"].(float64),
+		Sprite:   spirite,
+		Username: username,
 	}
 
 	//log.Printf("user to be added: %+v\n", user)
@@ -87,10 +88,11 @@ func join(conn *websocket.Conn, payload map[string]interface{}) {
 	message = Message{
 		Type: "user-join",
 		Payload: map[string]interface{}{
-			"userId":  user.Id,
-			"x":       user.X,
-			"y":       user.Y,
-			"spirite": user.Sprite,
+			"userId":   user.Id,
+			"x":        user.X,
+			"y":        user.Y,
+			"spirite":  user.Sprite,
+			"username": user.Username,
 		},
 	}
 	jsonMessage, err = json.Marshal(message)

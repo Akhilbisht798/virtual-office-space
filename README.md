@@ -49,4 +49,9 @@ docker run -d --name minio \
   - [x] same charecter for same user. 
   - [x] good ui like for shadcn etc. 
   - [x] show recent spaces. 
-- [ ] hosting it. 
+- [x] hosting it. 
+- [ ] name of the user on the charecter. 
+- [ ] check why websocket server is the way it is. 
+- [ ] some good ui changes. 
+- [ ] github ci/cd cycle. 
+- [ ] done. 

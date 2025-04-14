@@ -425,9 +425,12 @@ class GameScene extends Phaser.Scene {
 
     users.forEach((u) => {
       const spirite = u.sprite;
+      const username = u.username;
       const p = this.createSpirite(spirite);
+      const pName = this.add.text(p.x - 10, p.y - 40, username);
       p.play("chIdle", true)
       p.userId = u.userId;
+      p.username = pName
       this.players[u.userId] = p;
     });
     this.player.x = spawn.x;
@@ -436,14 +439,21 @@ class GameScene extends Phaser.Scene {
 
   userJoin(payload) {
     const spirite = payload["spirite"]
+    const username = payload["username"];
+    const x = payload["x"];
+    const y = payload["y"];
+
     const p = this.createSpirite(spirite)
+    const pName = this.add.text(x - 10, y - 40, username);
     p.play("chIdle", true)
     p.userId = payload.userId;
+    p.username = pName;
     this.players[payload.userId] = p;
   }
 
   userLeft(payload) {
     const uId = payload["userId"];
+    this.players[uId].username.destroy();
     this.players[uId].destroy();
     delete this.players[uId];
   }
@@ -475,6 +485,7 @@ class GameScene extends Phaser.Scene {
       })
     }
     this.players[payload.userId].setPosition(payload.x, payload.y);
+    this.players[payload.userId].username.setPosition(payload.x - 10, payload.y - 40);
   }
 
   movementRejected(payload) {
