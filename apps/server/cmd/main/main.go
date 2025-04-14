@@ -31,6 +31,7 @@ func main() {
 
 	//r.HandleFunc("/api/v1/getSprite", middleware.ApplyMiddleware(apis.GetSprite, middleware.EnableCORS))
 	r.HandleFunc("/api/v1/uploadSprite", middleware.ApplyMiddleware(apis.UploadSprite, middleware.EnableCORS))
+	r.HandleFunc("/api/v1/getUser", middleware.ApplyMiddleware(apis.GetUserDetailsHandler, middleware.EnableCORS))
 
 	r.HandleFunc("/api/v1/getMaps", middleware.ApplyMiddleware(apis.GetMaps, middleware.EnableCORS))
 	r.HandleFunc("/api/v1/getSpaces", middleware.ApplyMiddleware(apis.GetSpaces, middleware.EnableCORS))

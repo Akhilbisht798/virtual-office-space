@@ -12,19 +12,21 @@ import (
 )
 
 type UserConn struct {
-	conn   *websocket.Conn
-	Id     string  `json:"id"`
-	X      float64 `json:"x"`
-	Y      float64 `json:"y"`
-	Sprite string  `json:"sprite"`
+	conn     *websocket.Conn
+	Id       string  `json:"id"`
+	X        float64 `json:"x"`
+	Y        float64 `json:"y"`
+	Sprite   string  `json:"sprite"`
+	Username string  `json:"username"`
 }
 
-type GetUserSpriteRequest struct {
+type GetUserRequest struct {
 	UserID string `json:"userID"`
 }
 
-type GetSpriteResponse struct {
-	Sprite string `json:"sprite"`
+type GetUserResponse struct {
+	UserID   string `json:"userID"`
+	Username string `json:"username"`
 }
 
 func GetUser(userId string) (string, error) {
@@ -32,8 +34,8 @@ func GetUser(userId string) (string, error) {
 	if serverUrl == "" {
 		return "", errors.New("server url not found in the env")
 	}
-	url := serverUrl + "/api/v1/getSprite"
-	payload := GetUserSpriteRequest{
+	url := serverUrl + "/api/v1/getUser"
+	payload := GetUserRequest{
 		UserID: userId,
 	}
 	jsonData, err := json.Marshal(payload)
@@ -49,12 +51,12 @@ func GetUser(userId string) (string, error) {
 
 	defer resp.Body.Close()
 
-	var data GetSpriteResponse
+	var data GetUserResponse
 	err = json.NewDecoder(resp.Body).Decode(&data)
 	if err != nil {
 		log.Println(err.Error())
 		return "", err
 	}
 	//fmt.Println("Sprite is: ", data.Sprite)
-	return data.Sprite, nil
+	return data.Username, nil
 }
