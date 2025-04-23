@@ -21,6 +21,18 @@ func ApplyMiddleware(h http.HandlerFunc, middlewares ...Middleware) http.Handler
 
 func EnableCORS(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		allowedOrigins := []string{
+			os.Getenv("FRONTEND_URL"),
+			os.Getenv("SOCKET_URL"),
+		}
+		origin := r.Header.Get("Origin")
+		for _, allowedOrigin := range allowedOrigins {
+			if origin == allowedOrigin {
+				w.Header().Set("Access-Control-Allow-Origin", allowedOrigin)
+				break
+			}
+		}
+
 		w.Header().Set("Access-Control-Allow-Origin", os.Getenv("FRONTEND_URL"))
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
