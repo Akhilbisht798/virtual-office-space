@@ -50,8 +50,8 @@ docker run -d --name minio \
   - [x] good ui like for shadcn etc. 
   - [x] show recent spaces. 
 - [x] hosting it. 
-- [ ] name of the user on the charecter. 
-- [ ] check why websocket server is the way it is. 
-- [ ] some good ui changes. 
-- [ ] github ci/cd cycle. 
-- [ ] done. 
+- [x] name of the user on the charecter. 
+- [x] check why websocket server is the way it is. 
+- [x] some good ui changes. 
+- [x] github ci/cd cycle. 
+- [x] done. 

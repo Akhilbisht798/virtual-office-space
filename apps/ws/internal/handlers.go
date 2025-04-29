@@ -9,9 +9,6 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-var Rooms *RoomManager
-var CallManager *Calls
-
 // TODO: make handle payload properly.
 // maybe later.
 func join(conn *websocket.Conn, payload map[string]interface{}) {
