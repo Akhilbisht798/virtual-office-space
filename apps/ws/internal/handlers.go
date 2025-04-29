@@ -104,10 +104,26 @@ func join(conn *websocket.Conn, payload map[string]interface{}) {
 }
 
 func move(conn *websocket.Conn, payload map[string]interface{}) {
-	room := payload["roomId"].(string)
-	userId := payload["userId"].(string)
-	x := payload["x"].(float64)
-	y := payload["y"].(float64)
+	room, ok := payload["roomId"].(string)
+	if !ok {
+		log.Println("roomId not available")
+		return
+	}
+	userId, ok := payload["userId"].(string)
+	if !ok {
+		log.Println("userId not available")
+		return
+	}
+	x, ok := payload["x"].(float64)
+	if !ok {
+		log.Println("x not available")
+		return
+	}
+	y, ok := payload["y"].(float64)
+	if !ok {
+		log.Println("x not available")
+		return
+	}
 
 	var user *UserConn
 
@@ -122,7 +138,7 @@ func move(conn *websocket.Conn, payload map[string]interface{}) {
 
 	message := Message{
 		Type: "movement",
-		Payload: map[string]interface{}{
+		Payload: map[string]any{
 			"userId": userId,
 			"x":      x,
 			"y":      y,
