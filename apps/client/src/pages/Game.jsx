@@ -118,8 +118,10 @@ const Game = ({ spaceId }) => {
       if (ws) {
         ws.close();
       }
-      game.input.keyboard.destroy();
-      game.destroy(true, true);
+      if (game) {
+        game.input.keyboard.destroy();
+        game.destroy(true, true);
+      }
       //TODO: check if all the assets will be deleted.
     };
   }, []);
