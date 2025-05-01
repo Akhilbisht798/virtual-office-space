@@ -46,7 +46,7 @@ function App() {
     <div className="bg-white min-h-screen">
       <TopBar />
       <div className="flex items-center gap-8 p-4">
-        <img src="/home/office.webp" alt="office" className="w-1/3 rounded-lg"/>
+        <img src="/home/office2.png" alt="office" className="w-1/3 rounded-lg max-w-xs h-auto object-contain"/>
         <div className="flex flex-col items-start gap-6">
           <h1 className="text-center text-5xl font-semibold text-black">
             Welcome to Nuzo
